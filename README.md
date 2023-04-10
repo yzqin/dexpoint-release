@@ -18,3 +18,8 @@ gdown https://drive.google.com/uc?id=1Xe3jgcIUZm_8yaFUsHnO7WJWr8cV41fE
 - `hand_teleop`: main entry for the environment, utils, and other staff needs for teleoperation and RL training.
 - `assets`: robot and object models, and other static files
 - `main`: entry files
+
+## How to use
+
+Play with the `runnable` files inside the `main` directory. It provides an example of how to use PointCloud and Imaged
+Point Cloud in your environment.
