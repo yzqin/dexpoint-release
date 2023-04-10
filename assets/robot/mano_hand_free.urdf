@@ -1,0 +1,635 @@
+<?xml version="1.0"?>
+<robot name="mano_robot">
+  <link name="root0_human_hand"></link>
+  <joint name="x_joint" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 -0 0"/>
+    <parent link="root0_human_hand"/>
+    <child link="root1_human_hand"/>
+    <limit effort="0" velocity="0" lower="-1" upper="1"/>
+  </joint>
+  <link name="root1_human_hand"></link>
+  <joint name="y_joint" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="root1_human_hand"/>
+    <child link="root2_human_hand"/>
+    <limit effort="0" velocity="0" lower="-1" upper="1"/>
+  </joint>
+  <link name="root2_human_hand"></link>
+  <joint name="z_joint" type="prismatic">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="root2_human_hand"/>
+    <child link="root3_human_hand"/>
+    <limit effort="0" velocity="0" lower="-1" upper="1"/>
+  </joint>
+  <link name="root3_human_hand"></link>
+  <joint name="x_rotation_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="-3.14159 1.5708 3.14159"/>
+    <parent link="root3_human_hand"/>
+    <child link="root4_human_hand"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="root4_human_hand"></link>
+  <joint name="y_rotation_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="root4_human_hand"/>
+    <child link="root5_human_hand"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="root5_human_hand"></link>
+  <joint name="z_rotation_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="root5_human_hand"/>
+    <child link="palm"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="palm">
+    <collision>
+      <origin xyz="0.0475691 0.0188623 1.86265e-09" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.0951381 0.022 0.0203155"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.0511472 -0.00145321 -3.49246e-10" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.102295 0.022 0.0203155"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.0453388 -0.0217687 -3.72529e-09" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.0906777 0.022 0.0203155"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.0388847 -0.0420842 -7.45058e-09" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.0777693 0.022 0.0203155"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0475691 0.0188623 1.86265e-09" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.0951381 0.022 0.0203155"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.0511472 -0.00145321 -3.49246e-10" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.102295 0.022 0.0203155"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.0453388 -0.0217687 -3.72529e-09" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.0906777 0.022 0.0203155"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.0388847 -0.0420842 -7.45058e-09" rpy="-1.5708 -3.14159 0"/>
+      <geometry>
+        <box size="0.0777693 0.022 0.0203155"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="thumb_0_0_joint" type="revolute">
+    <origin xyz="0.0363318 0.0246488 -0.020259" rpy="-1.5708 -3.14159 0"/>
+    <parent link="palm"/>
+    <child link="thumb_0_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_0_0_link"></link>
+  <joint name="thumb_0_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="thumb_0_0_link"/>
+    <child link="thumb_0_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_0_1_link"></link>
+  <joint name="thumb_0_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="thumb_0_1_link"/>
+    <child link="thumb_0_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_0_2_link">
+    <collision>
+      <origin xyz="0.0120113 0.000454064 0.00817428" rpy="3.11035 2.16835 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.029072"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0120113 0.000454064 0.00817428" rpy="3.11035 2.16835 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.029072"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="thumb_1_0_joint" type="revolute">
+    <origin xyz="0.0240226 0.000908128 0.0163486" rpy="3.13883 1.5708 3.13883"/>
+    <parent link="thumb_0_2_link"/>
+    <child link="thumb_1_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_1_0_link"></link>
+  <joint name="thumb_1_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="thumb_1_0_link"/>
+    <child link="thumb_1_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_1_1_link"></link>
+  <joint name="thumb_1_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="thumb_1_1_link"/>
+    <child link="thumb_1_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_1_2_link">
+    <collision>
+      <origin xyz="0.00749843 -0.00250645 0.0099117" rpy="0.199 0.647664 9.34247e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0253575"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.00749843 -0.00250645 0.0099117" rpy="0.199 0.647664 9.34247e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0253575"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="thumb_2_0_joint" type="revolute">
+    <origin xyz="0.0149969 -0.0050129 0.0198234" rpy="0.0132575 1.5708 0.0132575"/>
+    <parent link="thumb_1_2_link"/>
+    <child link="thumb_2_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_2_0_link"></link>
+  <joint name="thumb_2_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="thumb_2_0_link"/>
+    <child link="thumb_2_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_2_1_link"></link>
+  <joint name="thumb_2_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="thumb_2_1_link"/>
+    <child link="thumb_2_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="thumb_2_2_link">
+    <collision>
+      <origin xyz="0.0125695 -0.0018718 0.00968644" rpy="0.117412 0.914223 6.10297e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0319577"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0125695 -0.0018718 0.00968644" rpy="0.117412 0.914223 6.10297e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0319577"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="thumb_tip_joint" type="fixed">
+    <origin xyz="0.0251391 0.0012564 0.0193729" rpy="0.0220935 1.5708 0.0220935"/>
+    <parent link="thumb_2_2_link"/>
+    <child link="thumb_tip_link"/>
+  </joint>
+  <link name="thumb_tip_link"></link>
+  <joint name="index_0_0_joint" type="revolute">
+    <origin xyz="0.0951381 0.0188623 -0.0116275" rpy="-1.5708 -3.14159 0"/>
+    <parent link="palm"/>
+    <child link="index_0_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_0_0_link"></link>
+  <joint name="index_0_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="index_0_0_link"/>
+    <child link="index_0_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_0_1_link"></link>
+  <joint name="index_0_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="index_0_1_link"/>
+    <child link="index_0_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_0_2_link">
+    <collision>
+      <origin xyz="0.00149147 0.00104834 0.0155323" rpy="3.07451 3.04586 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0312779"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.00149147 0.00104834 0.0155323" rpy="3.07451 3.04586 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0312779"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="index_1_0_joint" type="revolute">
+    <origin xyz="0.00298294 0.00209668 0.0310646" rpy="3.13377 1.5708 3.13377"/>
+    <parent link="index_0_2_link"/>
+    <child link="index_1_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_1_0_link"></link>
+  <joint name="index_1_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="index_1_0_link"/>
+    <child link="index_1_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_1_1_link"></link>
+  <joint name="index_1_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="index_1_1_link"/>
+    <child link="index_1_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_1_2_link">
+    <collision>
+      <origin xyz="6.171e-05 -0.0011359 0.0109661" rpy="-3.03838 3.13597 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0220498"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="6.171e-05 -0.0011359 0.0109661" rpy="-3.03838 3.13597 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0220498"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="index_2_0_joint" type="revolute">
+    <origin xyz="0.00012342 -0.0022718 0.0219321" rpy="0.0198503 1.5708 0.0198503"/>
+    <parent link="index_1_2_link"/>
+    <child link="index_2_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_2_0_link"></link>
+  <joint name="index_2_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="index_2_0_link"/>
+    <child link="index_2_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_2_1_link"></link>
+  <joint name="index_2_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="index_2_1_link"/>
+    <child link="index_2_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="index_2_2_link">
+    <collision>
+      <origin xyz="-0.000167853 -0.0020358 0.0124742" rpy="0.161761 -0.0134548 1.62996e-08"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0252806"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.000167853 -0.0020358 0.0124742" rpy="0.161761 -0.0134548 1.62996e-08"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0252806"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="index_tip_joint" type="fixed">
+    <origin xyz="-0.000335706 0.000928403 0.0249484" rpy="3.13553 1.5708 3.13553"/>
+    <parent link="index_2_2_link"/>
+    <child link="index_tip_link"/>
+  </joint>
+  <link name="index_tip_link"></link>
+  <joint name="middle_0_0_joint" type="revolute">
+    <origin xyz="0.102294 -0.00363575 -0.00933084" rpy="-1.5708 -3.14159 0"/>
+    <parent link="palm"/>
+    <child link="middle_0_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_0_0_link"></link>
+  <joint name="middle_0_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="middle_0_0_link"/>
+    <child link="middle_0_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_0_1_link"></link>
+  <joint name="middle_0_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="middle_0_1_link"/>
+    <child link="middle_0_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_0_2_link">
+    <collision>
+      <origin xyz="-0.00196572 0.000395011 0.014875" rpy="3.11527 -3.0102 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.030019"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00196572 0.000395011 0.014875" rpy="3.11527 -3.0102 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.030019"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="middle_1_0_joint" type="revolute">
+    <origin xyz="-0.00393145 0.000790022 0.02975" rpy="3.14035 1.5708 3.14035"/>
+    <parent link="middle_0_2_link"/>
+    <child link="middle_1_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_1_0_link"></link>
+  <joint name="middle_1_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="middle_1_0_link"/>
+    <child link="middle_1_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_1_1_link"></link>
+  <joint name="middle_1_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="middle_1_1_link"/>
+    <child link="middle_1_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_1_2_link">
+    <collision>
+      <origin xyz="-0.00199627 -0.000948748 0.0114394" rpy="-3.06007 -2.96882 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0233019"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00199627 -0.000948748 0.0114394" rpy="-3.06007 -2.96882 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0233019"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="middle_2_0_joint" type="revolute">
+    <origin xyz="-0.00399254 -0.0018975 0.0228788" rpy="0.00184142 1.5708 0.00184142"/>
+    <parent link="middle_1_2_link"/>
+    <child link="middle_2_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_2_0_link"></link>
+  <joint name="middle_2_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="middle_2_0_link"/>
+    <child link="middle_2_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_2_1_link"></link>
+  <joint name="middle_2_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="middle_2_1_link"/>
+    <child link="middle_2_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="middle_2_2_link">
+    <collision>
+      <origin xyz="-0.00282417 -0.000628313 0.0134477" rpy="-3.0959 -2.93459 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0275107"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00282417 -0.000628313 0.0134477" rpy="-3.0959 -2.93459 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0275107"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="middle_tip_joint" type="fixed">
+    <origin xyz="-0.00564834 0.00374338 0.0268953" rpy="0.00230194 1.5708 0.00230193"/>
+    <parent link="middle_2_2_link"/>
+    <child link="middle_tip_link"/>
+  </joint>
+  <link name="middle_tip_link"></link>
+  <joint name="ring_0_0_joint" type="revolute">
+    <origin xyz="0.0906777 -0.0261954 -0.0121529" rpy="-1.5708 -3.14159 0"/>
+    <parent link="palm"/>
+    <child link="ring_0_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_0_0_link"></link>
+  <joint name="ring_0_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="ring_0_0_link"/>
+    <child link="ring_0_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_0_1_link"></link>
+  <joint name="ring_0_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="ring_0_1_link"/>
+    <child link="ring_0_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_0_2_link">
+    <collision>
+      <origin xyz="-0.00254697 0.000716265 0.0135523" rpy="3.0897 -2.95582 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0276162"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00254697 0.000716265 0.0135523" rpy="3.0897 -2.95582 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0276162"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ring_1_0_joint" type="revolute">
+    <origin xyz="-0.00509394 0.00143253 0.0271046" rpy="3.13804 1.5708 3.13804"/>
+    <parent link="ring_0_2_link"/>
+    <child link="ring_1_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_1_0_link"></link>
+  <joint name="ring_1_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="ring_1_0_link"/>
+    <child link="ring_1_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_1_1_link"></link>
+  <joint name="ring_1_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="ring_1_1_link"/>
+    <child link="ring_1_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_1_2_link">
+    <collision>
+      <origin xyz="-0.00344962 -0.000682638 0.0110756" rpy="0.0587784 -0.301938 6.82815e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0232409"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00344962 -0.000682638 0.0110756" rpy="0.0587784 -0.301938 6.82815e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0232409"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ring_2_0_joint" type="revolute">
+    <origin xyz="-0.00689924 -0.00136528 0.0221512" rpy="0.00644492 1.5708 0.00644493"/>
+    <parent link="ring_1_2_link"/>
+    <child link="ring_2_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_2_0_link"></link>
+  <joint name="ring_2_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="ring_2_0_link"/>
+    <child link="ring_2_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_2_1_link"></link>
+  <joint name="ring_2_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="ring_2_1_link"/>
+    <child link="ring_2_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="ring_2_2_link">
+    <collision>
+      <origin xyz="-0.00328433 -0.000587584 0.0120675" rpy="-3.09464 -2.87587 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0250404"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00328433 -0.000587584 0.0120675" rpy="-3.09464 -2.87587 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0250404"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="ring_tip_joint" type="fixed">
+    <origin xyz="-0.00656866 0.00382484 0.024135" rpy="0.00138116 1.5708 0.00138116"/>
+    <parent link="ring_2_2_link"/>
+    <child link="ring_tip_link"/>
+  </joint>
+  <link name="ring_tip_link"></link>
+  <joint name="little_0_0_joint" type="revolute">
+    <origin xyz="0.0777693 -0.0420842 -0.0172379" rpy="-1.5708 -3.14159 0"/>
+    <parent link="palm"/>
+    <child link="little_0_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_0_0_link"></link>
+  <joint name="little_0_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="little_0_0_link"/>
+    <child link="little_0_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_0_1_link"></link>
+  <joint name="little_0_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="little_0_1_link"/>
+    <child link="little_0_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_0_2_link">
+    <collision>
+      <origin xyz="-0.00583244 -0.000524366 0.0074139" rpy="0.0555308 -0.666572 0"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0188953"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00583244 -0.000524366 0.0074139" rpy="0.0555308 -0.666572 0"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0188953"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="little_1_0_joint" type="revolute">
+    <origin xyz="-0.0116649 -0.00104873 0.0148278" rpy="3.12834 1.5708 3.12834"/>
+    <parent link="little_0_2_link"/>
+    <child link="little_1_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_1_0_link"></link>
+  <joint name="little_1_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="little_1_0_link"/>
+    <child link="little_1_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_1_1_link"></link>
+  <joint name="little_1_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="little_1_1_link"/>
+    <child link="little_1_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_1_2_link">
+    <collision>
+      <origin xyz="-0.00548209 -0.000771352 0.0075154" rpy="-3.05886 -2.51138 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0186686"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.00548209 -0.000771352 0.0075154" rpy="-3.05886 -2.51138 3.14159"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0186686"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="little_2_0_joint" type="revolute">
+    <origin xyz="-0.0109642 -0.00154271 0.0150308" rpy="3.12134 1.5708 3.12134"/>
+    <parent link="little_1_2_link"/>
+    <child link="little_2_0_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_2_0_link"></link>
+  <joint name="little_2_1_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 -0 1.5708"/>
+    <parent link="little_2_0_link"/>
+    <child link="little_2_1_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_2_1_link"></link>
+  <joint name="little_2_2_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="1.5708 -1.5708 3.14159"/>
+    <parent link="little_2_1_link"/>
+    <child link="little_2_2_link"/>
+    <limit effort="0" velocity="0" lower="-3.14159" upper="3.14159"/>
+  </joint>
+  <link name="little_2_2_link">
+    <collision>
+      <origin xyz="-0.005257 -0.00162149 0.00902173" rpy="0.15406 -0.527605 8.6232e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0211336"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.005257 -0.00162149 0.00902173" rpy="0.15406 -0.527605 8.6232e-09"/>
+      <geometry>
+        <capsule radius="0.01" length="0.0211336"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="little_tip_joint" type="fixed">
+    <origin xyz="-0.010514 0.00175703 0.0180435" rpy="0.0220935 1.5708 0.0220935"/>
+    <parent link="little_2_2_link"/>
+    <child link="little_tip_link"/>
+  </joint>
+  <link name="little_tip_link"></link>
+</robot>
