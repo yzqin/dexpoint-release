@@ -7,12 +7,12 @@ import numpy as np
 import sapien.core as sapien
 import transforms3d
 
-from hand_teleop.env.sim_env.base import BaseSimulationEnv
-from hand_teleop.env.sim_env.constructor import add_default_scene_light
-from hand_teleop.kinematics.kinematics_helper import PartialKinematicModel
-from hand_teleop.utils.common_robot_utils import load_robot, generate_arm_robot_hand_info, \
+from dexpoint.env.sim_env.base import BaseSimulationEnv
+from dexpoint.env.sim_env.constructor import add_default_scene_light
+from dexpoint.kinematics.kinematics_helper import PartialKinematicModel
+from dexpoint.utils.common_robot_utils import load_robot, generate_arm_robot_hand_info, \
     generate_free_robot_hand_info, FreeRobotInfo, ArmRobotInfo
-from hand_teleop.utils.random_utils import np_random
+from dexpoint.utils.random_utils import np_random
 
 VISUAL_OBS_RETURN_TORCH = False
 MAX_DEPTH_RANGE = 2.5
@@ -250,7 +250,7 @@ class BaseRLEnv(BaseSimulationEnv, gym.Env):
             raise RuntimeError(f"Only point cloud, depth, and segmentation are allowed when no_rgb is enabled.")
 
     def setup_imagination_config(self, config: Dict[str, Dict[str, int]]):
-        from hand_teleop.utils.render_scene_utils import actor_to_open3d_mesh
+        from dexpoint.utils.render_scene_utils import actor_to_open3d_mesh
         import open3d as o3d
         # Imagination can only be used with point cloud representation
         for name, camera_cfg in self.camera_infos.items():

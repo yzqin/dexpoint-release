@@ -8,8 +8,8 @@ import transforms3d.quaternions
 from sapien.core import Pose
 from sapien.utils import Viewer
 
-from hand_teleop.env.sim_env.constructor import get_engine_and_renderer, add_default_scene_light
-from hand_teleop.utils.random_utils import np_random
+from dexpoint.env.sim_env.constructor import get_engine_and_renderer, add_default_scene_light
+from dexpoint.utils.random_utils import np_random
 
 
 def recover_action(action, limit):
@@ -44,24 +44,16 @@ class BaseSimulationEnv(object):
         self.seed()
         self.current_step = 0
 
+    def __del__(self):
+        self.scene = None
+
     def simple_step(self):
-        self.pre_step()
         for i in range(self.frame_skip):
             self.scene.step()
-        self.post_step()
         self.current_step += 1
-
-    def pre_step(self):
-        pass
-
-    def post_step(self):
-        pass
 
     def reset_env(self):
         raise NotImplementedError
-
-    def __del__(self):
-        self.scene = None
 
     def seed(self, seed=None):
         self.np_random, seed = np_random(seed)

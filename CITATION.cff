@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "Thanks for using ManiSkill2. If you use this software, please cite it as below."
+authors:
+- family-names: "Qin"
+  given-names: "Yuzhe"
+- family-names: "Huang"
+  given-names: "Binghao"
+- family-names: "Yin"
+  given-names: "Zhao-Heng"
+- family-names: "Su"
+  given-names: "Hao"
+- family-names: "Wang"
+  given-names: "Xiaolong"
+title: "DexPoint"
+version: 0.4.0
+date-released: 2023-04-10
+url: "https://github.com/yzqin/dexpoint_release"
+preferred-citation:
+  type: conference-paper
+  title: "DexPoint: Generalizable Point Cloud Reinforcement Learning for Sim-to-Real Dexterous Manipulation"
+  authors:
+  - family-names: "Qin"
+    given-names: "Yuzhe"
+  - family-names: "Huang"
+    given-names: "Binghao"
+  - family-names: "Yin"
+    given-names: "Zhao-Heng"
+  - family-names: "Su"
+    given-names: "Hao"
+  - family-names: "Wang"
+    given-names: "Xiaolong"
+  booktitle: "Conference on Robot Learning"
+  year: 2023
+  start: 594
+  end: 605
+  organization: PMLR

@@ -1,13 +1,12 @@
 import os
 from typing import List, Optional, Union
 
-import cv2
 import numpy as np
 import open3d as o3d
 from sapien import core as sapien
 from sapien.core.pysapien import renderer as R
 
-from hand_teleop.utils.mesh_utils import compute_smooth_shading_normal_np
+from dexpoint.utils.mesh_utils import compute_smooth_shading_normal_np
 
 Vector3dVector = o3d.utility.Vector3dVector
 Vector3iVector = o3d.utility.Vector3iVector
@@ -36,6 +35,7 @@ def render_geometry_to_open3d_mesh(render_shape: sapien.RenderShape, is_collisio
     triangle_mesh.vertex_normals = Vector3dVector(normals)
     if is_collision_mesh:
         if has_material:
+            import cv2
             img = cv2.imread(material.diffuse_texture_filename)
             triangle_mesh.textures = o3d.geometry.Image(img)
         else:
@@ -78,6 +78,7 @@ def render_body_to_open3d_mesh(render_body: sapien.RenderBody, use_texture=True)
                                                       Vector3iVector(indices))
             triangle_mesh.vertex_normals = Vector3dVector(normals)
             if has_material and use_texture:
+                import cv2
                 img = cv2.imread(material.diffuse_texture_filename)
                 triangle_mesh.textures = o3d.geometry.Image(img)
             else:

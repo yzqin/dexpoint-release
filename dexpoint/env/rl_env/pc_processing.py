@@ -1,6 +1,6 @@
 import numpy as np
 
-from hand_teleop.real_world import lab
+from dexpoint.real_world import lab
 
 ROBOT_TABLE_MARGIN_X = 0.06
 ROBOT_TABLE_MARGIN_Y = 0.04

@@ -1,5 +1,5 @@
-from hand_teleop.env.rl_env.pc_processing import process_relocate_pc, add_gaussian_noise, process_relocate_pc_noise
-from hand_teleop.real_world import lab
+from dexpoint.env.rl_env.pc_processing import process_relocate_pc, add_gaussian_noise, process_relocate_pc_noise
+from dexpoint.real_world import lab
 import numpy as np
 
 # Camera config

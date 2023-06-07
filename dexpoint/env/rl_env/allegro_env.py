@@ -4,7 +4,7 @@ from typing import Optional, List
 import numpy as np
 import sapien.core as sapien
 
-from hand_teleop.env.rl_env.base import BaseRLEnv
+from dexpoint.env.rl_env.base import BaseRLEnv
 
 
 class AllegroRLEnv(BaseRLEnv, ABC):

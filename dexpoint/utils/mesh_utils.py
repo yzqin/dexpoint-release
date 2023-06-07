@@ -1,5 +1,4 @@
 import numpy as np
-import torch
 
 
 def compute_smooth_shading_normal_np(vertices, indices):

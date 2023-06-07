@@ -8,7 +8,7 @@ CAM2ROBOT = Pose.from_transformation_matrix(np.array(
      [0., 0., 0., 1.]]
 ))
 
-DESK2ROBOT_Z_AXIS = -0.1352233
+DESK2ROBOT_Z_AXIS = -0.05
 
 # Relocate
 RELOCATE_BOUND = [0.2, 0.8, -0.4, 0.4, DESK2ROBOT_Z_AXIS + 0.005, 0.6]
