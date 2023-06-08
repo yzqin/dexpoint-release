@@ -2,7 +2,6 @@ import os
 from time import time
 
 import numpy as np
-import open3d as o3d
 
 from dexpoint.env.rl_env.relocate_env import AllegroRelocateRLEnv
 from dexpoint.real_world import task_setting
@@ -27,8 +26,11 @@ if __name__ == '__main__':
         # Create camera
         environment.setup_camera_from_config(task_setting.CAMERA_CONFIG["relocate"])
 
-        # Specify observation modality
+        # Specify observation
         environment.setup_visual_obs_config(task_setting.OBS_CONFIG["relocate_noise"])
+
+        # Specify imagination
+        environment.setup_imagination_config(task_setting.IMG_CONFIG["relocate_robot_only"])
         return environment
 
 
@@ -39,13 +41,6 @@ if __name__ == '__main__':
     print(env.action_space)
 
     obs = env.reset()
-    print("For state task, observation is a numpy array. For visual tasks, observation is a python dict.")
-
-    print("Observation keys")
-    print(obs.keys())
-    # The name of the key in observation is "CAMERA_NAME"-"MODALITY_NAME".
-    # While CAMERA_NAME is defined in task_setting.CAMERA_CONFIG["relocate"], name is point_cloud.
-    # See example_use_multi_camera_visual_env.py for more modalities.
 
     tic = time()
     rl_steps = 1000
@@ -53,19 +48,10 @@ if __name__ == '__main__':
         action = np.zeros(env.action_space.shape)
         action[0] = 0.002  # Moving forward ee link in x-axis
         obs, reward, done, info = env.step(action)
-
-    pc = obs["relocate-point_cloud"]
-
     elapsed_time = time() - tic
+
     simulation_steps = rl_steps * env.frame_skip
     print(f"Single process for point-cloud environment with {rl_steps} RL steps "
           f"(= {simulation_steps} simulation steps) takes {elapsed_time}s.")
     print("Keep in mind that using multiple processes during RL training can significantly increase the speed.")
     env.scene = None
-
-    # Note1: point cloud are represented x-forward convention in robot frame, see visualization to get a sense of frame
-    # Note2: you may also need to remove the points with smaller depth
-    # Note3: as described in the paper, the point are cropped into the robot workspace without background and table
-    cloud = o3d.geometry.PointCloud(points=o3d.utility.Vector3dVector(pc))
-    coordinate = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05, origin=[0, 0, 0])
-    o3d.visualization.draw_geometries([cloud, coordinate])

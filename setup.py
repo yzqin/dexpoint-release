@@ -23,6 +23,7 @@ setup(
         'sapien==2.1.0',
         "open3d>=0.15.2",
         "imageio",
+        "torch>=1.11.0"
     ],
     extras_require={"tests": ["pytest", "black", "isort"], "meshcat": ["meshcat"]},
 )
