@@ -1,6 +1,4 @@
-# DexPoint: Generalizable Point Cloud Reinforcement Learning for
-
-Sim-to-Real Dexterous Manipulation with Point Cloud Input
+# DexPoint: Generalizable Point Cloud Reinforcement Learning for Sim-to-Real Dexterous Manipulation 
 
 [[Project Page]](https://yzqin.github.io/dexpoint/) [[Paper]](https://arxiv.org/abs/2211.09423) [[Poster]](https://docs.google.com/presentation/d/1dDtAPQ49k1emhETRPAib5R0wCGdwlz5l/edit?usp=sharing&ouid=108317450590466198031&rtpof=true&sd=true)
 -----
