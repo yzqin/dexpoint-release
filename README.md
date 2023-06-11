@@ -1,6 +1,6 @@
 # DexPoint: Generalizable Point Cloud Reinforcement Learning for
 
-Sim-to-Real Dexterous Manipulation
+Sim-to-Real Dexterous Manipulation with Point Cloud Input
 
 [[Project Page]](https://yzqin.github.io/dexpoint/) [[Paper]](https://arxiv.org/abs/2211.09423) [[Poster]](https://docs.google.com/presentation/d/1dDtAPQ49k1emhETRPAib5R0wCGdwlz5l/edit?usp=sharing&ouid=108317450590466198031&rtpof=true&sd=true)
 -----
@@ -71,6 +71,14 @@ environments.
 
 The environment we used in the training of DexPoint paper can be found here
 in [example_dexpoint_grasping.py](example/example_dexpoint_grasping.py).
+
+## Acknowledgements
+
+We would like to thank the following people for making this project possible:
+
+- [Tongzhou Mu](https://cseweb.ucsd.edu//~t3mu/) and [Ruihan Yang](https://rchalyang.github.io/) for helpful discussion
+  and feedback.
+- [Fanbo Xiang](https://www.fbxiang.com/) for invaluable help on rendering.
 
 ### Example extension of DexPoint environment framework in other project
 
