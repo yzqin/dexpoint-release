@@ -83,7 +83,7 @@ We would like to thank the following people for making this project possible:
 [DexArt: Benchmarking Generalizable Dexterous Manipulation with Articulated Objects (CVPR 2023)](https://github.com/Kami-code/dexart-release):
 extend DexPoint to articulated object manipulation.
 
-[From One Hand to Multiple Hands: Imitation Learning for Dexterous Manipulation from Single-Camera Teleoperation (RA-L 2022)](https://yzqin.github.io/dex-teleop-imitation/):
+[From One Hand to Multiple Hands: Imitation Learning for Dexterous Manipulation from Single-Camera Teleoperation (RA-L 2022)](https://github.com/yzqin/dex-hand-teleop):
 use teleoperation for data collection in DexPoint environment.
 
 
