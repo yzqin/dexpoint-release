@@ -25,5 +25,5 @@ setup(
         "imageio",
         "torch>=1.11.0"
     ],
-    extras_require={"tests": ["pytest", "black", "isort"], "meshcat": ["meshcat"]},
+    extras_require={"tests": ["pytest", "black", "isort"]},
 )
