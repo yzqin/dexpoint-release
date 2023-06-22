@@ -24,7 +24,8 @@ def load_shapenet_object_list():
             cat_object_list = f.read().split("\n")
         cat_dict[cat] = {}
         for model_id in cat_object_list:
-            cat_dict[cat][model_id] = cat_scale[cat][model_id]
+            if len(model_id) > 0:
+                cat_dict[cat][model_id] = cat_scale[cat][model_id]
         cat_dict[cat]["train"] = cat_object_list[:10]
         cat_dict[cat]["eval"] = cat_object_list[10:]
 
