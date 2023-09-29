@@ -1,6 +1,6 @@
 # DexPoint: Generalizable Point Cloud Reinforcement Learning for Sim-to-Real Dexterous Manipulation 
 
-[[Project Page]](https://yzqin.github.io/dexpoint/) [[Paper]](https://arxiv.org/abs/2211.09423) [[Poster]](https://docs.google.com/presentation/d/1dDtAPQ49k1emhETRPAib5R0wCGdwlz5l/edit?usp=sharing&ouid=108317450590466198031&rtpof=true&sd=true)
+[[Project Page]](https://yzqin.github.io/dexpoint/) [[Paper]](https://arxiv.org/abs/2211.09423) [[Poster]](https://docs.google.com/presentation/d/1dDtAPQ49k1emhETRPAib5R0wCGdwlz5l/edit?usp=sharing&ouid=108317450590466198031&rtpof=true&sd=true)[[ShapeNet Object Models]](https://drive.google.com/file/d/1liqE8Zin4tAlfFcJBIpT1Qn2Nyzl3Nke/view?usp=sharing)
 -----
 
 [DexPoint: Generalizable Point Cloud Reinforcement Learning for
@@ -69,6 +69,12 @@ environments.
 
 The environment we used in the training of DexPoint paper can be found here
 in [example_dexpoint_grasping.py](example/example_dexpoint_grasping.py).
+
+### Training
+
+Download the ShapeNet models from [Google Drive](https://drive.google.com/file/d/1liqE8Zin4tAlfFcJBIpT1Qn2Nyzl3Nke/view?usp=sharing) can place it inside the following directory `dexpoint-release/assets/shapenet/`.
+
+The `DexPoint` repo is using the same training code as [DexArt](https://github.com/Kami-code/dexart-release) and environment interface for RL training. Please check the training code [here](https://github.com/Kami-code/dexart-release/tree/main/stable_baselines3) to train DexPoint with PPO.
 
 ## Acknowledgements
 
