@@ -5,6 +5,8 @@ import random
 from collections import OrderedDict
 import torch.nn as nn
 import numpy as np
+import time
+
 
 import argparse
 from dexpoint.env.rl_env.relocate_env import AllegroRelocateRLEnv
@@ -16,7 +18,8 @@ from stable_baselines3.simple_callback import SimpleCallback
 import torch
 
 BASE_DIR = os.path.abspath((os.path.join(os.path.dirname(__file__), '..')))
-SAVE_DIR=os.path.join(BASE_DIR,'assets/checkpoints/')
+time_now = time.strftime("%Y%m%d-%H%M", time.localtime())
+SAVE_DIR=os.path.join(BASE_DIR,'assets/checkpoints/')+time_now
 
 
 def get_3d_policy_kwargs(extractor_name):
