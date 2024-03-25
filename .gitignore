@@ -19,3 +19,5 @@ imgui.ini
 /hand_detector/extra_data/
 /hand_detector/video/
 /assets/misc/ktx/day.ktx
+/DexPoint.egg-info/
+/assets/checkpoints/

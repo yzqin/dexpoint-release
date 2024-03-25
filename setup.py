@@ -20,7 +20,7 @@ setup(
         "numpy",
         "transforms3d",
         "gym==0.25.2",
-        'sapien==2.1.0',
+        'sapien>=2.1.0',
         "open3d>=0.15.2",
         "imageio",
         "torch>=1.11.0"

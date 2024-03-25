@@ -56,6 +56,7 @@ if __name__ == '__main__':
     elapsed_time = time() - tic
 
     pc = obs["relocate-point_cloud"]
+    print('pc shape',pc.shape)
     # The name of the key in observation is "CAMERA_NAME"-"MODALITY_NAME".
     # While CAMERA_NAME is defined in task_setting.CAMERA_CONFIG["relocate"], name is point_cloud.
     # See example_use_multi_camera_visual_env.py for more modalities.
@@ -80,5 +81,6 @@ if __name__ == '__main__':
     obs_cloud.paint_uniform_color(np.array([1, 0, 0]))
     coordinate = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05, origin=[0, 0, 0])
     o3d.visualization.draw_geometries([imagination_goal_cloud, imagination_robot_cloud, coordinate, obs_cloud])
+    print('obs shape:', pc.shape)
 
     env.scene = None
