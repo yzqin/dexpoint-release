@@ -7,14 +7,13 @@ import torch.nn as nn
 import numpy as np
 import time
 
-
 import argparse
 from dexpoint.env.rl_env.relocate_env import AllegroRelocateRLEnv
 from dexpoint.real_world import task_setting
-from stable_baselines3.common.torch_layers import PointNetImaginationExtractorGP
-from stable_baselines3.common.vec_env.subproc_vec_env import SubprocVecEnv
-from stable_baselines3.ppo import PPO
-from stable_baselines3.simple_callback import SimpleCallback
+from stable_baselines_dexpoint.common.torch_layers import PointNetImaginationExtractorGP
+from stable_baselines_dexpoint.common.vec_env.subproc_vec_env import SubprocVecEnv
+from stable_baselines_dexpoint.ppo import PPO
+from stable_baselines_dexpoint.simple_callback import SimpleCallback
 import torch
 
 BASE_DIR = os.path.abspath((os.path.join(os.path.dirname(__file__), '..')))
@@ -41,10 +40,10 @@ def get_3d_policy_kwargs(extractor_name):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--n', type=int, default=10)
-    parser.add_argument('--workers', type=int, default=1)
+    parser.add_argument('--workers', type=int, default=2)
     parser.add_argument('--lr', type=float, default=3e-4)
     parser.add_argument('--ep', type=int, default=10)
-    parser.add_argument('--bs', type=int, default=10)
+    parser.add_argument('--bs', type=int, default=50)
     parser.add_argument('--seed', type=int, default=100)
     parser.add_argument('--iter', type=int, default=1000)
     parser.add_argument('--freeze', dest='freeze', action='store_true', default=False)
@@ -67,11 +66,13 @@ if __name__ == '__main__':
 
 
     def create_env_fn():
-        object_names = ["mustard_bottle", "tomato_soup_can", "potted_meat_can"]
-        object_name = np.random.choice(object_names)
+        # object_names = ["mustard_bottle", "tomato_soup_can", "potted_meat_can"]
+        # object_name = np.random.choice(object_names)
         rotation_reward_weight = 0  # whether to match the orientation of the goal pose
         use_visual_obs = True
-        env_params = dict(object_name=object_name, rotation_reward_weight=rotation_reward_weight,
+        object_name='any_train'
+        object_category="02876657"
+        env_params = dict(object_name=object_name, object_category=object_category, rotation_reward_weight=rotation_reward_weight,
                           randomness_scale=1, use_visual_obs=use_visual_obs, use_gui=False,
                           no_rgb=True)
 
@@ -121,7 +122,7 @@ if __name__ == '__main__':
                 adaptive_kl=0.02,
                 target_kl=0.2,
                 )
-
+    print('policy net:',model.policy)
     if pretrain_path is not None:
         state_dict: OrderedDict = torch.load(pretrain_path)
         model.policy.features_extractor.extractor.load_state_dict(state_dict, strict=False)
