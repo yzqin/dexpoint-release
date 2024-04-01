@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--task_name', type=str, default="laptop")
     parser.add_argument('--extractor_name', type=str, default="smallpn")
     parser.add_argument('--pretrain_path', type=str, default=None)
-    parser.add_argument('--save_freq', type=int, default=1)
+    parser.add_argument('--save_freq', type=int, default=10)
     parser.add_argument('--save_path', type=str, default=SAVE_DIR)
     args = parser.parse_args()
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         # On a multi-GPU machine, this sets the rendering GPU and RL training GPU to be the same,
         # based on "CUDA_VISIBLE_DEVICES".
         if "CUDA_VISIBLE_DEVICES" in os.environ:
-            env_params["device"] = "cuda"
+            env_params["device"] = "cuda:3"
         environment = AllegroRelocateRLEnv(**env_params)
 
         # Create camera

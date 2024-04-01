@@ -159,7 +159,7 @@ class AllegroRelocateRLEnv(LabRelocateEnv, BaseRLEnv):
 
 def main_env():
     from time import time
-    env = AllegroRelocateRLEnv(use_gui=True, robot_name="allegro_hand_xarm6_wrist_mounted_face_front",
+    env = AllegroRelocateRLEnv(use_gui=True, robot_name="allegro_hand_xarm7",
                                object_name="any_train", object_category="02876657", frame_skip=10,
                                use_visual_obs=False)
     base_env = env
@@ -174,7 +174,7 @@ def main_env():
 
     tic = time()
     for i in range(1000):
-        action = np.random.rand(robot_dof) * 2 - 1
+        action = np.random.rand(22) * 2 - 1
         action[2] = 0.1
         obs, reward, done, _ = env.step(action)
     tac = time()
@@ -189,7 +189,7 @@ def main_env():
     viewer.toggle_pause(True)
     pose = env.palm_link.get_pose()
     for i in range(5000):
-        action = np.zeros(robot_dof)
+        action = np.zeros(22)
         action[0] = 0.05
         obs, reward, done, _ = env.step(action)
         env.render()
