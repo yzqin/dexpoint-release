@@ -72,7 +72,7 @@ if __name__ == '__main__':
         use_visual_obs = True
         # object_name='any_train'
         # object_category="02876657"
-        env_params = dict(object_name=object_name, rotation_reward_weight=rotation_reward_weight,
+        env_params = dict(robot_name="allegro_hand_xarm6_wrist_mounted_face_down",object_name=object_name, rotation_reward_weight=rotation_reward_weight,
                           randomness_scale=1, use_visual_obs=use_visual_obs, use_gui=True,
                           no_rgb=True)
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     #env = SubprocVecEnv([create_env_fn] * args.workers, "spawn")  # train on a list of envs.
     env=create_env_fn()
 
-    checkpoint_path='/home/wyk/Dex/dexpoint-release/assets/checkpoints/model_480.zip'
+    checkpoint_path='/home/wyk/Dex/dexpoint-release/assets/checkpoints/model_1000.zip'
     policy = PPO.load(checkpoint_path, env, 'cuda',
                       policy_kwargs=get_3d_policy_kwargs(extractor_name=extractor_name),
                       check_obs_space=False, force_load=True)
