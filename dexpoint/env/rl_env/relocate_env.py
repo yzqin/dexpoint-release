@@ -14,7 +14,7 @@ OBJECT_LIFT_LOWER_LIMIT = -0.03
 
 
 class AllegroRelocateRLEnv(LabRelocateEnv, BaseRLEnv):
-    def __init__(self, use_gui=False, frame_skip=10, robot_name="allegro_hand_xarm6_wrist_mounted_face_down",
+    def __init__(self, use_gui=False, frame_skip=10, robot_name="allegro_hand_xarm7",
                  rotation_reward_weight=0, object_category="YCB", object_name="tomato_soup_can",
                  randomness_scale=1, friction=1, root_frame="robot", **renderer_kwargs):
         if "allegro" not in robot_name or "free" in robot_name:
@@ -183,6 +183,8 @@ def main_env():
     viewer = Viewer(base_env.renderer)
     viewer.set_scene(base_env.scene)
     base_env.viewer = viewer
+
+    
 
     env.reset()
     # env.reset_env()

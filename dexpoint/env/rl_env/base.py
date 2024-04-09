@@ -77,7 +77,7 @@ class BaseRLEnv(BaseSimulationEnv, gym.Env):
 
     @property
     def action_dim(self):
-        return self.robot.dof
+        return 22
 
     @property
     @abstractmethod
