@@ -84,6 +84,8 @@ class LabRelocateEnv(BaseSimulationEnv):
             orientation = YCB_ORIENTATION[self.object_name]
         else:
             orientation = np.array([1, 0, 0, 0])
+        pos[0]+=0.1
+        pos[1]-=0.1
         position = np.array([pos[0], pos[1], self.object_height])
         pose = sapien.Pose(position, orientation)
         return pose

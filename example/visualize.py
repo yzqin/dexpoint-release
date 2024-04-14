@@ -111,7 +111,7 @@ if __name__ == '__main__':
     #env = SubprocVecEnv([create_env_fn] * args.workers, "spawn")  # train on a list of envs.
     env=create_env_fn()
 
-    checkpoint_path='/home/yikai/dexpoint-release/assets/checkpoints/20240410-0800/model_0.zip'
+    checkpoint_path='/home/wyk/Dex/dexpoint-release/assets/checkpoints/20240411-1803/model_1000.zip'
     print(f"checkpoint_path: {checkpoint_path}")
     policy = PPO.load(checkpoint_path, env, 'cuda',
                       policy_kwargs=get_3d_policy_kwargs(extractor_name=extractor_name),
