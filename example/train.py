@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--task_name', type=str, default="laptop")
     parser.add_argument('--extractor_name', type=str, default="smallpn")
     parser.add_argument('--pretrain_path', type=str, default=None)
-    parser.add_argument('--save_freq', type=int, default=10)
+    parser.add_argument('--save_freq', type=int, default=50)
     parser.add_argument('--save_path', type=str, default=SAVE_DIR)
     args = parser.parse_args()
 
