@@ -93,6 +93,8 @@ class LabRelocateEnv(BaseSimulationEnv):
     def generate_random_target_pose(self, randomness_scale):
         pos = self.np_random.uniform(low=-0.2, high=0.2, size=2) * randomness_scale
         height = 0.25
+        pos[0]+=0.1
+        pos[1]-=0.1
         position = np.array([pos[0], pos[1], height])
         # No randomness for the orientation. Keep the canonical orientation.
         if self.object_category == "ycb":
