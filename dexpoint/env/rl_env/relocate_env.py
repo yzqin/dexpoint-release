@@ -135,7 +135,7 @@ class AllegroRelocateRLEnv(LabRelocateEnv, BaseRLEnv):
         self.robot.set_drive_target(qpos)
 
         # Set robot pose
-        init_pos = np.array(lab.ROBOT2BASE.p) + self.robot_info.root_offset
+        init_pos = np.array(lab.r_ROBOT2BASE.p) + self.robot_info.root_offset
         init_pose = sapien.Pose(init_pos, transforms3d.euler.euler2quat(0, 0, 0))
         self.robot.set_pose(init_pose)
 

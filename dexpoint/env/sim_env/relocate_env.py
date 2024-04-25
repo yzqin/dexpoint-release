@@ -163,8 +163,8 @@ class LabRelocateEnv(BaseSimulationEnv):
         table_height += robot_table_offset
         builder = self.scene.create_actor_builder()
         top_pose = sapien.Pose(
-            np.array([lab.ROBOT2BASE.p[0] - table_half_size[0] + 0.08,
-                      lab.ROBOT2BASE.p[1] - table_half_size[1] + 0.08,
+            np.array([lab.r_ROBOT2BASE.p[0] - table_half_size[0] + 0.08,
+                      lab.r_ROBOT2BASE.p[1] - table_half_size[1] + 0.08,
                       -table_thickness / 2 + robot_table_offset]))
         top_material = self.scene.create_physical_material(1, 0.5, 0.01)
         builder.add_box_collision(pose=top_pose, half_size=table_half_size, material=top_material)

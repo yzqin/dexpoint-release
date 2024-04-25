@@ -34,7 +34,9 @@ RELOCATE_BOUND = [0.2, 0.8, -0.4, 0.4, DESK2ROBOT_Z_AXIS + 0.005, 0.6]
 
 
 # TODO:
-ROBOT2BASE = Pose(p=np.array([-0.37+0.125, -0.64 + 0.125, -DESK2ROBOT_Z_AXIS]))  # Pose(p=np.array([-0.55, 0., -DESK2ROBOT_Z_AXIS]))
+l_ROBOT2BASE = Pose(p=np.array([-0.37+0.125, -0.64 + 1.025, -DESK2ROBOT_Z_AXIS]))  # Pose(p=np.array([-0.55, 0., -DESK2ROBOT_Z_AXIS]))
+r_ROBOT2BASE = Pose(p=np.array([-0.37+0.125, -0.64 + 0.125, -DESK2ROBOT_Z_AXIS]))  # Pose(p=np.array([-0.55, 0., -DESK2ROBOT_Z_AXIS]))
+
 
 # Table size
 TABLE_XY_SIZE = np.array([0.74, 1.28])    # origin 0.6, 1.2
