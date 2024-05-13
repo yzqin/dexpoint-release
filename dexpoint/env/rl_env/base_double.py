@@ -158,7 +158,7 @@ class BaseDoubleRLEnv(BaseSimulationEnv, gym.Env):
         #                     current_qpos[6:] + allowed_hand_motion[:, 1])
         l_target_qpos = np.concatenate([l_arm_qpos, l_hand_qpos])
         l_target_qvel = np.zeros_like(l_target_qpos)
-        l_target_qvel[:self.arm_dof] = l_arm_qvel
+        l_target_qvel[:self.arm_dof] = l_arm_qvel    
         self.l_robot.set_drive_target(l_target_qpos)
         self.l_robot.set_drive_velocity_target(l_target_qvel)
 
@@ -244,6 +244,7 @@ class BaseDoubleRLEnv(BaseSimulationEnv, gym.Env):
         if self.current_step >= self.horizon:
             info["TimeLimit.truncated"] = not done
             done = True
+            
         return obs, reward, done, info
 
     def setup_visual_obs_config(self, config: Dict[str, Dict]):
@@ -351,7 +352,7 @@ class BaseDoubleRLEnv(BaseSimulationEnv, gym.Env):
                     mat = pose.to_transformation_matrix()
                     transformed_points = points @ mat[:3, :3].T + mat[:3, 3][None, :]
                     imagination_robot.append(transformed_points)
-                    self.imaginations["l_imagination_robot"] = np.concatenate(imagination_robot, axis=0)
+                    self.imaginations["l_imagination_robot"] = np.concatenate(imagination_robot, axis=0,dtype=np.float32)
             if img_type == "r_robot":
                 imagination_robot = []
                 for link_name, (actor, points, img_class) in img_config.items():
@@ -359,7 +360,7 @@ class BaseDoubleRLEnv(BaseSimulationEnv, gym.Env):
                     mat = pose.to_transformation_matrix()
                     transformed_points = points @ mat[:3, :3].T + mat[:3, 3][None, :]
                     imagination_robot.append(transformed_points)
-                    self.imaginations["r_imagination_robot"] = np.concatenate(imagination_robot, axis=0)
+                    self.imaginations["r_imagination_robot"] = np.concatenate(imagination_robot, axis=0, dtype=np.float32)
 
     @property
     def obs_dim(self):
@@ -426,7 +427,7 @@ class BaseDoubleRLEnv(BaseSimulationEnv, gym.Env):
                     kwargs = camera_cfg["point_cloud"].get("process_fn_kwargs", {})
                     obs = camera_cfg["point_cloud"]["process_fn"](obs, camera_pose,
                                                                   camera_cfg["point_cloud"]["num_points"],
-                                                                  self.np_random, **kwargs)
+                                                                  self.np_random, **kwargs).astype(np.float32)
                     if "additional_process_fn" in camera_cfg["point_cloud"]:
                         for fn in camera_cfg["point_cloud"]["additional_process_fn"]:
                             obs = fn(obs, self.np_random)
@@ -444,7 +445,8 @@ class BaseDoubleRLEnv(BaseSimulationEnv, gym.Env):
     def get_camera_to_robot_pose(self, camera_name):
         gl_pose = self.cameras[camera_name].get_pose()
         camera_pose = gl_pose * gl2sapien
-        camera2robot = self.robot.get_pose().inv() * camera_pose
+        # TODO
+        camera2robot = self.l_robot.get_pose().inv() * camera_pose
         return camera2robot.to_transformation_matrix()
 
     @cached_property
@@ -461,7 +463,8 @@ class BaseDoubleRLEnv(BaseSimulationEnv, gym.Env):
         else:
             oracle_dim = len(self.get_oracle_state())
             oracle_space = gym.spaces.Box(low=-np.inf * np.ones(oracle_dim), high=np.inf * np.ones(oracle_dim))
-            obs_dict = {"state": state_space, "oracle_state": oracle_space}
+            obs_dict = dict(state=state_space, oracle_state=oracle_space)
+            
             for cam_name, cam_cfg in self.camera_infos.items():
                 cam = self.cameras[cam_name]
                 resolution = (cam.height, cam.width)

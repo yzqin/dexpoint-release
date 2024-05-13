@@ -159,10 +159,16 @@ class AllegroRelocateRLEnv(LabRelocateEnv, BaseRLEnv):
 
 def main_env():
     from time import time
+    import sys, os
+    
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+    from stable_baselines_dexpoint.common.env_checker import check_env
     env = AllegroRelocateRLEnv(use_gui=True, robot_name="allegro_hand_xarm7",
                                object_name="any_train", object_category="02876657", frame_skip=10,
-                               use_visual_obs=False)
+                               use_visual_obs=True)
     base_env = env
+    check_env(env)
+
     robot_dof = env.robot.dof
     env.seed(0)
     env.reset()

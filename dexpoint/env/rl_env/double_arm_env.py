@@ -25,6 +25,7 @@ class DoubleAllegroRelocateRLEnv(LabRelocateEnv, BaseDoubleRLEnv):
 
         # Base class
         self.setup()
+        self.env_name='double_arm'
         self.rotation_reward_weight = rotation_reward_weight
 
         # Parse link name
@@ -67,11 +68,11 @@ class DoubleAllegroRelocateRLEnv(LabRelocateEnv, BaseDoubleRLEnv):
         self.object_pose = self.manipulated_object.get_pose()
         self.l_palm_pose = self.l_palm_link.get_pose()
         self.l_palm_pos_in_base = np.zeros(3)
-        self.object_in_tip_l = np.zeros([len(finger_tip_names), 3])
+        self.l_object_in_tip = np.zeros([len(finger_tip_names), 3])
 
         self.r_palm_pose = self.r_palm_link.get_pose()
         self.r_palm_pos_in_base = np.zeros(3)
-        self.object_in_tip_r = np.zeros([len(finger_tip_names), 3])
+        self.r_object_in_tip = np.zeros([len(finger_tip_names), 3])
 
         self.target_in_object = np.zeros([3])
         self.target_in_object_angle = np.zeros([1])
@@ -80,6 +81,7 @@ class DoubleAllegroRelocateRLEnv(LabRelocateEnv, BaseDoubleRLEnv):
         # Contact buffer
         self.l_robot_object_contact = np.zeros(len(finger_tip_names) + 1)  # four tip, palm 
         self.r_robot_object_contact = np.zeros(len(finger_tip_names) + 1)  # four tip, palm 
+
 
 
     def update_cached_state(self):
@@ -115,20 +117,23 @@ class DoubleAllegroRelocateRLEnv(LabRelocateEnv, BaseDoubleRLEnv):
         l_robot_qpos_vec = self.l_robot.get_qpos()
         r_robot_qpos_vec = self.r_robot.get_qpos()
 
-        return np.concatenate([
+
+        oracle_state=np.concatenate([
             l_robot_qpos_vec, r_robot_qpos_vec, self.l_palm_pos_in_base, self.r_palm_pos_in_base,  # （dof + 3)*2
             object_pose_vec, self.l_object_in_tip.flatten(), self.r_object_in_tip.flatten(),self.l_robot_object_contact,self.r_robot_object_contact,  # 7 + (12 + 5)*2
             self.target_in_object, self.target_pose.q, self.target_in_object_angle  # 3 + 4 + 1
-        ])
+        ], dtype=np.float32)
+        return oracle_state
 
     def get_robot_state(self):
         l_robot_qpos_vec = self.l_robot.get_qpos()
         r_robot_qpos_vec = self.r_robot.get_qpos()
 
-        return np.concatenate([
+        robot_state=np.concatenate([
             l_robot_qpos_vec,r_robot_qpos_vec, self.l_palm_pos_in_base,self.r_palm_pos_in_base,
             self.target_pose.p - self.base_frame_pos, self.target_pose.q
-        ])
+        ], dtype=np.float32)
+        return robot_state
 
     def get_reward(self, action):
         l_finger_object_dist = np.linalg.norm(self.l_object_in_tip, axis=1, keepdims=False)
@@ -174,6 +179,7 @@ class DoubleAllegroRelocateRLEnv(LabRelocateEnv, BaseDoubleRLEnv):
         r_qpos[:self.arm_dof] = r_xarm_qpos
         self.r_robot.set_qpos(r_qpos)
         self.r_robot.set_drive_target(r_qpos)
+        
 
         # Set robot pose
         l_init_pos = np.array(lab.l_ROBOT2BASE.p) + self.l_robot_info.root_offset
@@ -196,7 +202,7 @@ class DoubleAllegroRelocateRLEnv(LabRelocateEnv, BaseDoubleRLEnv):
         return self.get_observation()
 
     def is_done(self):
-        return self.object_lift < OBJECT_LIFT_LOWER_LIMIT
+        return bool(self.object_lift < OBJECT_LIFT_LOWER_LIMIT)
 
     @cached_property
     def horizon(self):
@@ -204,14 +210,35 @@ class DoubleAllegroRelocateRLEnv(LabRelocateEnv, BaseDoubleRLEnv):
 
 
 def main_env():
+    import sys, os
+
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+    from stable_baselines_dexpoint.common.env_checker import check_env
+    
+    
     from time import time
     env = DoubleAllegroRelocateRLEnv(use_gui=True, robot_name="allegro_hand_xarm7",
                                object_name="any_train", object_category="02876657", frame_skip=10,
-                               use_visual_obs=False)
+                               use_visual_obs=True)
     base_env = env
+    from dexpoint.real_world import task_setting
+
+    # Create camera
+    env.setup_camera_from_config(task_setting.CAMERA_CONFIG["relocate"])
+
+    # Specify observation
+    env.setup_visual_obs_config(task_setting.OBS_CONFIG["relocate_noise"])
+    # Specify imagination
+    env.setup_imagination_config(task_setting.IMG_CONFIG["relocate_robot_only"])
+
+    # It will check your custom environment and output additional warnings if needed
+    print('obs space:', env.observation_space)
+    check_env(env)
     #robot_dof = env.robot.dof
     env.seed(0)
     env.reset()
+
+
 
     tic = time()
     env.reset()
