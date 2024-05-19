@@ -29,6 +29,7 @@ class STN3d(nn.Module):
 		batchsize = x.size()[0]
 		x = F.relu(self.bn1(self.conv1(x)))
 		x = F.relu(self.bn2(self.conv2(x)))
+	
 		x = F.relu(self.bn3(self.conv3(x)))
 		x = torch.max(x, 2, keepdim=True)[0]
 		x = x.view(-1, 1024)
@@ -113,7 +114,7 @@ class PointNetfeat(nn.Module):
 			x = x.transpose(2,1)
 		else:
 			trans_feat = None
-
+		
 		pointfeat = x
 		x = F.relu(self.bn2(self.conv2(x)))
 		x = self.bn3(self.conv3(x))

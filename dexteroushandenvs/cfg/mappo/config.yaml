@@ -2,7 +2,8 @@ env_name: mappo
 algorithm_name: mappo
 experiment_name: check
 run_dir: ./logs
-use_centralized_V: True
+use_centralized_V: False 
+# use_centralized_V: True
 use_obs_instead_of_state: False
 # num_env_steps: 1000000000
 num_env_steps: 100000000
@@ -47,7 +48,7 @@ use_huber_loss: True
 use_value_active_masks: False
 use_policy_active_masks: False
 
-lr: 5.e-4
+lr: 3.e-4
 critic_lr: 5.e-4
 opti_eps: 1.e-5
 weight_decay: 0.0

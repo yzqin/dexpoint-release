@@ -127,16 +127,17 @@ class MAPPO():
         active_masks_batch = check(active_masks_batch).to(**self.tpdv)
 
         # Reshape to do in a single forward pass for all steps
-        values, action_log_probs, dist_entropy = self.policy.evaluate_actions(share_obs_batch,
+        values, action_log_probs, dist_entropy = self.policy.evaluate_actions(#share_obs_batch,
                                                                               obs_batch,
-                                                                              rnn_states_batch,
-                                                                              rnn_states_critic_batch,
+                                                                              #rnn_states_batch,
+                                                                              #rnn_states_critic_batch,
                                                                               actions_batch,
-                                                                              masks_batch,
-                                                                              available_actions_batch,
-                                                                              active_masks_batch)
+                                                                              #masks_batch,
+                                                                              #available_actions_batch,
+                                                                              #active_masks_batch
+                                                                              )
         # actor update
-        imp_weights = torch.exp((action_log_probs - old_action_log_probs_batch).sum(dim=-1, keepdim=True))
+        imp_weights = torch.exp((action_log_probs - old_action_log_probs_batch))#.sum(dim=-1, keepdim=True))
 
         surr1 = imp_weights * adv_targ
         surr2 = torch.clamp(imp_weights, 1.0 - self.clip_param, 1.0 + self.clip_param) * adv_targ
@@ -150,31 +151,40 @@ class MAPPO():
 
         policy_loss = policy_action_loss
 
-        self.policy.actor_optimizer.zero_grad()
+        
 
         if update_actor:
-            (policy_loss - dist_entropy * self.entropy_coef).backward()
+            loss=(policy_loss - torch.mean(dist_entropy) * self.entropy_coef)
 
-        if self._use_max_grad_norm:
-            actor_grad_norm = nn.utils.clip_grad_norm_(self.policy.actor.parameters(), self.max_grad_norm)
-        else:
-            actor_grad_norm = get_gard_norm(self.policy.actor.parameters())
-
-        self.policy.actor_optimizer.step()
+        #print('policy_loss:',policy_loss)
+        #print('dist_entropy:',dist_entropy)
+        
 
         # critic update
         value_loss = self.cal_value_loss(values, value_preds_batch, return_batch, active_masks_batch)
+        loss+=value_loss* self.value_loss_coef
+        #print('loss:',loss)
+        
 
-        self.policy.critic_optimizer.zero_grad()
+       
 
-        (value_loss * self.value_loss_coef).backward()
-
+        # if self._use_max_grad_norm:
+        #     critic_grad_norm = nn.utils.clip_grad_norm_(self.policy.critic.parameters(), self.max_grad_norm)
+        # else:
+        #     critic_grad_norm = get_gard_norm(self.policy.critic.parameters())
+        
+        # lr = self.kl_scheduler.update(approx_kl_div)
+        # update_learning_rate(self.policy.optimizer, lr)
+        self.policy.optimizer.zero_grad()
+        loss.backward()
         if self._use_max_grad_norm:
-            critic_grad_norm = nn.utils.clip_grad_norm_(self.policy.critic.parameters(), self.max_grad_norm)
+            nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
+            actor_grad_norm = get_gard_norm(self.policy.action_net.parameters())
+            critic_grad_norm = get_gard_norm(self.policy.value_net.parameters())
         else:
-            critic_grad_norm = get_gard_norm(self.policy.critic.parameters())
-
-        self.policy.critic_optimizer.step()
+            actor_grad_norm = get_gard_norm(self.policy.action_net.parameters())
+            critic_grad_norm = get_gard_norm(self.policy.value_net.parameters())
+        self.policy.optimizer.step()
 
         return value_loss, critic_grad_norm, policy_loss, dist_entropy, actor_grad_norm, imp_weights
 
@@ -221,7 +231,8 @@ class MAPPO():
 
                 train_info['value_loss'] += value_loss.item()
                 train_info['policy_loss'] += policy_loss.item()
-                train_info['dist_entropy'] += dist_entropy.item()
+                #print('dist entropy:',dist_entropy)
+                train_info['dist_entropy'] += torch.mean(dist_entropy).item()
                 train_info['actor_grad_norm'] += actor_grad_norm
                 train_info['critic_grad_norm'] += critic_grad_norm
                 train_info['ratio'] += imp_weights.mean()
@@ -234,10 +245,11 @@ class MAPPO():
         return train_info
 
     def prep_training(self):
-        self.policy.actor.train()
-        self.policy.critic.train()
+        self.policy.train()
+        # self.policy.actor.train()
+        # self.policy.critic.train()
 
     def prep_rollout(self):
-        self.policy.actor.eval()
-        self.policy.critic.eval()
+        self.policy.eval()
+        #self.policy.critic.eval()
 

@@ -23,17 +23,23 @@ class SeparatedReplayBuffer(object):
         self._use_proper_time_limits = config["use_proper_time_limits"]
         self.device = config["device"]
 
-        obs_shape = get_shape_from_obs_space(obs_space)
-        share_obs_shape = get_shape_from_obs_space(share_obs_space)
+        # obs_shape = get_shape_from_obs_space(obs_space)
+        # share_obs_shape = get_shape_from_obs_space(share_obs_space)
 
-        if type(obs_shape[-1]) == list:
-            obs_shape = obs_shape[:1]
+        # if type(obs_shape[-1]) == list:
+        #     obs_shape = obs_shape[:1]
 
-        if type(share_obs_shape[-1]) == list:
-            share_obs_shape = share_obs_shape[:1]
+        # if type(share_obs_shape[-1]) == list:
+        #     share_obs_shape = share_obs_shape[:1]
 
-        self.share_obs = torch.zeros(self.episode_length + 1, self.n_rollout_threads, *share_obs_shape, device=self.device)
-        self.obs = torch.zeros(self.episode_length + 1, self.n_rollout_threads, *obs_shape, device=self.device)
+        self.obs = {}
+        self.share_obs={}
+        for key, obs_input_shape in obs_space.items():
+            self.obs[key] = torch.zeros((self.episode_length + 1, self.n_rollout_threads) + obs_input_shape.shape, device=self.device)
+        for key, share_obs_input_shape in share_obs_space.items():
+            self.share_obs[key] = torch.zeros((self.episode_length + 1, self.n_rollout_threads) + share_obs_input_shape.shape, device=self.device)
+        # self.share_obs = torch.zeros(self.episode_length + 1, self.n_rollout_threads, *share_obs_shape, device=self.device)
+        # self.obs = torch.zeros(self.episode_length + 1, self.n_rollout_threads, *obs_shape, device=self.device)
 
         self.rnn_states = torch.zeros(self.episode_length + 1, self.n_rollout_threads, self.recurrent_N, self.rnn_hidden_size, device=self.device)
         self.rnn_states_critic = torch.zeros_like(self.rnn_states)
@@ -49,7 +55,7 @@ class SeparatedReplayBuffer(object):
         act_shape = get_shape_from_act_space(act_space)
 
         self.actions = torch.zeros(self.episode_length, self.n_rollout_threads, act_shape, device=self.device)
-        self.action_log_probs = torch.zeros(self.episode_length, self.n_rollout_threads, act_shape, device=self.device)
+        self.action_log_probs = torch.zeros(self.episode_length, self.n_rollout_threads,1, device=self.device)
         self.rewards = torch.zeros(self.episode_length, self.n_rollout_threads, 1, device=self.device)
         
         self.masks = torch.ones(self.episode_length + 1, self.n_rollout_threads, 1, device=self.device)
@@ -65,12 +71,16 @@ class SeparatedReplayBuffer(object):
 
     def insert(self, share_obs, obs, rnn_states, rnn_states_critic, actions, action_log_probs,
                value_preds, rewards, masks, bad_masks=None, active_masks=None, available_actions=None):
-        self.share_obs[self.step + 1].copy_(share_obs)
-        self.obs[self.step + 1].copy_(obs)
+        for key in self.obs.keys():
+            self.obs[key][self.step+1].copy_(obs[key])
+        for key in self.share_obs.keys():
+            self.share_obs[key][self.step+1].copy_(share_obs[key])
+        # self.share_obs[self.step + 1].copy_(share_obs)
+        # self.obs[self.step + 1].copy_(obs)
         self.rnn_states[self.step + 1].copy_(rnn_states)
         self.rnn_states_critic[self.step + 1].copy_(rnn_states_critic)
         self.actions[self.step].copy_(actions)
-        self.action_log_probs[self.step].copy_(action_log_probs)
+        self.action_log_probs[self.step].copy_(action_log_probs.unsqueeze(-1))
         self.value_preds[self.step].copy_(value_preds)
         self.rewards[self.step].copy_(rewards)
         self.masks[self.step + 1].copy_(masks)
@@ -104,8 +114,12 @@ class SeparatedReplayBuffer(object):
         self.step = (self.step + 1) % self.episode_length
     
     def after_update(self):
-        self.share_obs[0].copy_(self.share_obs[-1])
-        self.obs[0].copy_(self.obs[-1])
+        for key in self.obs.keys():
+            self.obs[key][0].copy_(self.obs[key][-1])
+        for key in self.share_obs.keys():
+            self.share_obs[key][0].copy_(self.share_obs[key][-1])
+        # self.share_obs[0].copy_(self.share_obs[-1])
+        # self.obs[0].copy_(self.obs[-1])
         self.rnn_states[0].copy_(self.rnn_states[-1])
         self.rnn_states_critic[0].copy_(self.rnn_states_critic[-1])
         self.masks[0].copy_(self.masks[-1])
@@ -181,9 +195,10 @@ class SeparatedReplayBuffer(object):
 
         rand = torch.randperm(batch_size)
         sampler = [rand[i*mini_batch_size:(i+1)*mini_batch_size] for i in range(num_mini_batch)]
-
-        share_obs = self.share_obs[:-1].reshape(-1, *self.share_obs.shape[2:])
-        obs = self.obs[:-1].reshape(-1, *self.obs.shape[2:])
+        obs={key: obs[:-1].reshape(-1, *obs.shape[2:]) for (key, obs) in self.obs.items()}
+        share_obs={key: share_obs[:-1].reshape(-1, *share_obs.shape[2:]) for (key, share_obs) in self.share_obs.items()}
+        # share_obs = self.share_obs[:-1].reshape(-1, *self.share_obs.shape[2:])
+        # obs = self.obs[:-1].reshape(-1, *self.obs.shape[2:])
         rnn_states = self.rnn_states[:-1].reshape(-1, *self.rnn_states.shape[2:])
         rnn_states_critic = self.rnn_states_critic[:-1].reshape(-1, *self.rnn_states_critic.shape[2:])
         actions = self.actions.reshape(-1, self.actions.shape[-1])
@@ -201,8 +216,10 @@ class SeparatedReplayBuffer(object):
 
         for indices in sampler:
             # obs size [T+1 N Dim]-->[T N Dim]-->[T*N,Dim]-->[index,Dim]
-            share_obs_batch = share_obs[indices]
-            obs_batch = obs[indices]
+            #share_obs_batch = share_obs[indices]
+            #obs_batch = obs[indices]
+            obs_batch={key: obs[indices] for (key, obs) in obs.items()}
+            share_obs_batch={key: share_obs[indices] for (key, share_obs) in share_obs.items()}
             rnn_states_batch = rnn_states[indices]
             rnn_states_critic_batch = rnn_states_critic[indices]
             actions_batch = actions[indices]

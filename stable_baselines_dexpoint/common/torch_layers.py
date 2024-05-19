@@ -394,6 +394,7 @@ class PointNetImaginationExtractorGP(BaseFeaturesExtractor):
                 img_points = obs[:, :, :3]
 
                 points = torch.concat([points, img_points], dim=1)
+                #print('extractor device:', self.extractor.device)
         #print('final points shape:',points.shape)
 
         # points = torch.transpose(points, 1, 2)   # B * 3 * N

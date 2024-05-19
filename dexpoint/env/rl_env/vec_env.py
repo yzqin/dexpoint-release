@@ -25,13 +25,13 @@ def create_env_fn():
         env = DoubleAllegroRelocateRLEnv(**env_params)
         from dexpoint.real_world import task_setting
 
-        # # Create camera
-        # env.setup_camera_from_config(task_setting.CAMERA_CONFIG["relocate"])
+        # Create camera
+        env.setup_camera_from_config(task_setting.CAMERA_CONFIG["relocate"])
 
-        # # Specify observation
-        # env.setup_visual_obs_config(task_setting.OBS_CONFIG["relocate_noise"])
-        # # Specify imagination
-        # env.setup_imagination_config(task_setting.IMG_CONFIG["relocate_robot_only"])
+        # Specify observation
+        env.setup_visual_obs_config(task_setting.OBS_CONFIG["relocate_noise"])
+        # Specify imagination
+        env.setup_imagination_config(task_setting.IMG_CONFIG["relocate_robot_only"])
         
         return env
 

@@ -17,6 +17,14 @@ from torch.utils.tensorboard import SummaryWriter
 from itertools import chain
 from algorithms.marl.utils.separated_buffer import SeparatedReplayBuffer
 from utils.util import update_linear_schedule
+from stable_baselines_dexpoint.common.utils import (
+    check_for_correct_spaces,
+    get_device,
+    get_schedule_fn,
+    get_system_info,
+    set_random_seed,
+    update_learning_rate,
+)
 
 def _t2n(x):
     return x.detach().cpu().numpy()
@@ -26,11 +34,12 @@ class Runner:
     def __init__(self,
                  vec_env,
                  config,
-                 model_dir=""
+                 model_dir="", policy_kwargs=None
                  ):
         self.envs = vec_env
         self.eval_envs = vec_env
         # parameters
+        self.policy_kwargs = policy_kwargs
         self.env_name = vec_env.task.get_attr('env_name')[0]
         self.algorithm_name = config["algorithm_name"]
         self.experiment_name = config["experiment_name"]
@@ -51,6 +60,7 @@ class Runner:
         self.eval_interval = config["eval_interval"]
         self.eval_episodes = config["eval_episodes"]
         self.log_interval = config["log_interval"]
+        self.learning_rate = config["lr"] #3e-4
 
         self.seed = config['seed']
         print('seed:',self.seed)
@@ -85,16 +95,24 @@ class Runner:
         if self.algorithm_name == "mappo":
             from algorithms.marl.mappo_trainer import MAPPO as TrainAlgo
             from algorithms.marl.mappo_policy import MAPPO_Policy as Policy
+            from stable_baselines_dexpoint.common.policies import ActorCriticPolicy
 
         self.policy = []
+        self.lr_schedule = get_schedule_fn(self.learning_rate)
         for agent_id in range(self.num_agents):
             share_observation_space = self.envs.share_observation_space[agent_id] if self.use_centralized_V else self.envs.observation_space[agent_id]
             # policy network
-            po = Policy(config,
-                        self.envs.observation_space[agent_id],
-                        share_observation_space,
-                        self.envs.action_space[agent_id],
-                        device = self.device)
+            po=ActorCriticPolicy(self.envs.observation_space[agent_id],
+            self.envs.action_space[agent_id],
+            self.lr_schedule,
+            use_sde=False,
+            **self.policy_kwargs  # pytype:disable=not-instantiable
+        ).to(self.device)
+            # po = Policy(config,
+            #             self.envs.observation_space[agent_id],
+            #             share_observation_space,
+            #             self.envs.action_space[agent_id],
+            #             device = self.device)
             self.policy.append(po)
 
         if self.model_dir != "":
@@ -197,8 +215,12 @@ class Runner:
             share_obs = obs
 
         for agent_id in range(self.num_agents):
-            self.buffer[agent_id].share_obs[0].copy_(share_obs[:, agent_id])
-            self.buffer[agent_id].obs[0].copy_(obs[:, agent_id])
+            for key, item in obs[agent_id].items():
+                self.buffer[agent_id].obs[key][0].copy_(item)
+            for key, item in share_obs[agent_id].items():
+                self.buffer[agent_id].share_obs[key][0].copy_(item)
+            # self.buffer[agent_id].share_obs[0].copy_(share_obs[:, agent_id])
+            # self.buffer[agent_id].obs[0].copy_(obs[:, agent_id])
 
     @torch.no_grad()
     def collect(self, step):
@@ -209,12 +231,11 @@ class Runner:
         rnn_state_critic_collector = []
         for agent_id in range(self.num_agents):
             self.trainer[agent_id].prep_rollout()
-            value, action, action_log_prob, rnn_state, rnn_state_critic \
-                = self.trainer[agent_id].policy.get_actions(self.buffer[agent_id].share_obs[step],
-                                                            self.buffer[agent_id].obs[step],
-                                                            self.buffer[agent_id].rnn_states[step],
-                                                            self.buffer[agent_id].rnn_states_critic[step],
-                                                            self.buffer[agent_id].masks[step])
+            observations={key: obs[step] for (key, obs) in self.buffer[agent_id].obs.items()}
+            action, value, action_log_prob\
+                = self.trainer[agent_id].policy(observations)
+            rnn_state= self.buffer[agent_id].rnn_states[step]
+            rnn_state_critic= self.buffer[agent_id].rnn_states_critic[step]
             value_collector.append(value.detach())
             action_collector.append(action.detach())
             action_log_prob_collector.append(action_log_prob.detach())
@@ -251,9 +272,8 @@ class Runner:
 
         if not self.use_centralized_V:
             share_obs = obs
-
         for agent_id in range(self.num_agents):
-            self.buffer[agent_id].insert(share_obs[:, agent_id], obs[:, agent_id], rnn_states[:, agent_id],
+            self.buffer[agent_id].insert(share_obs[agent_id], obs[agent_id], rnn_states[:, agent_id],
                                          rnn_states_critic[:, agent_id], actions[agent_id],
                                          action_log_probs[agent_id],
                                          values[:, agent_id], rewards[:, agent_id], masks[:, agent_id], None,
@@ -283,12 +303,16 @@ class Runner:
                                                             available_actions,
                                                             self.buffer[agent_id].active_masks[:-1].reshape(-1, *self.buffer[agent_id].active_masks.shape[2:]))
             else:
-                old_actions_logprob, _ =self.trainer[agent_id].policy.actor.evaluate_actions(self.buffer[agent_id].obs[:-1].reshape(-1, *self.buffer[agent_id].obs.shape[2:]),
-                                                            self.buffer[agent_id].rnn_states[0:1].reshape(-1, *self.buffer[agent_id].rnn_states.shape[2:]),
+                observations={key: obs[:-1].reshape(-1, *obs.shape[2:]) for (key, obs) in self.buffer[agent_id].obs.items()}
+                # old_actions_logprob, _ =self.trainer[agent_id].policy.evaluate_actions(self.buffer[agent_id].obs[:-1].reshape(-1, *self.buffer[agent_id].obs.shape[2:]),
+                _,old_actions_logprob, _ =self.trainer[agent_id].policy.evaluate_actions(observations,
+
+                                                            # self.buffer[agent_id].rnn_states[0:1].reshape(-1, *self.buffer[agent_id].rnn_states.shape[2:]),
                                                             self.buffer[agent_id].actions.reshape(-1, *self.buffer[agent_id].actions.shape[2:]),
-                                                            self.buffer[agent_id].masks[:-1].reshape(-1, *self.buffer[agent_id].masks.shape[2:]),
-                                                            available_actions,
-                                                            self.buffer[agent_id].active_masks[:-1].reshape(-1, *self.buffer[agent_id].active_masks.shape[2:]))
+                                                            # self.buffer[agent_id].masks[:-1].reshape(-1, *self.buffer[agent_id].masks.shape[2:]),
+                                                            # available_actions,
+                                                            # self.buffer[agent_id].active_masks[:-1].reshape(-1, *self.buffer[agent_id].active_masks.shape[2:]))
+                                                            )
             train_info = self.trainer[agent_id].train(self.buffer[agent_id])
 
             if self.algorithm_name == "hatrpo":
@@ -299,14 +323,11 @@ class Runner:
                                                             available_actions,
                                                             self.buffer[agent_id].active_masks[:-1].reshape(-1, *self.buffer[agent_id].active_masks.shape[2:]))
             else:
-                new_actions_logprob, _ =self.trainer[agent_id].policy.actor.evaluate_actions(self.buffer[agent_id].obs[:-1].reshape(-1, *self.buffer[agent_id].obs.shape[2:]),
-                                                            self.buffer[agent_id].rnn_states[0:1].reshape(-1, *self.buffer[agent_id].rnn_states.shape[2:]),
+                observations={key: obs[:-1].reshape(-1, *obs.shape[2:]) for (key, obs) in self.buffer[agent_id].obs.items()}
+                _,new_actions_logprob, _ =self.trainer[agent_id].policy.evaluate_actions(observations,
                                                             self.buffer[agent_id].actions.reshape(-1, *self.buffer[agent_id].actions.shape[2:]),
-                                                            self.buffer[agent_id].masks[:-1].reshape(-1, *self.buffer[agent_id].masks.shape[2:]),
-                                                            available_actions,
-                                                            self.buffer[agent_id].active_masks[:-1].reshape(-1, *self.buffer[agent_id].active_masks.shape[2:]))
-
-            action_prod = torch.exp((new_actions_logprob.detach()-old_actions_logprob.detach()).reshape(self.episode_length,self.n_rollout_threads,action_dim).sum(dim=-1, keepdim=True))
+                )
+            action_prod = torch.exp((new_actions_logprob.detach()-old_actions_logprob.detach()).reshape(self.episode_length,self.n_rollout_threads,1).sum(dim=-1, keepdim=True))
             factor = factor*action_prod.detach()
             train_infos.append(train_info)      
             self.buffer[agent_id].after_update()
@@ -321,9 +342,9 @@ class Runner:
                 torch.save(policy_model.state_dict(), str(self.save_dir) + "/{}/model_agent".format(episode) + str(agent_id) + ".pt")
             else:
                 os.makedirs(str(self.save_dir) + "/{}".format(episode), exist_ok=True)
-                policy_actor = self.trainer[agent_id].policy.actor
+                policy_actor = self.trainer[agent_id].policy.action_net
                 torch.save(policy_actor.state_dict(), str(self.save_dir) + "/{}/actor_agent".format(episode) + str(agent_id) + ".pt")
-                policy_critic = self.trainer[agent_id].policy.critic
+                policy_critic = self.trainer[agent_id].policy.value_net
                 torch.save(policy_critic.state_dict(), str(self.save_dir) + "/{}/critic_agent".format(episode) + str(agent_id) + ".pt")
 
     def restore(self):
@@ -411,8 +432,7 @@ class Runner:
     def compute(self):
         for agent_id in range(self.num_agents):
             self.trainer[agent_id].prep_rollout()
-            next_value = self.trainer[agent_id].policy.get_values(self.buffer[agent_id].share_obs[-1], 
-                                                                self.buffer[agent_id].rnn_states_critic[-1],
-                                                                self.buffer[agent_id].masks[-1])
+            observations={key: obs[-1] for (key, obs) in self.buffer[agent_id].obs.items()}
+            next_value = self.trainer[agent_id].policy.predict_values(observations)
             next_value = next_value.detach()
             self.buffer[agent_id].compute_returns(next_value, self.trainer[agent_id].value_normalizer)

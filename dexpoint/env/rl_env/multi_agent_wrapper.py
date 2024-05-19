@@ -14,6 +14,7 @@ import numpy as np
 import copy
 
 
+
 # VecEnv Wrapper for RL training
 class MultiVecTaskAllegro():
     def __init__(self, task, rl_device, num_workers, clip_observations=5.0, clip_actions=1.0):
@@ -35,11 +36,19 @@ class MultiVecTaskAllegro():
         self.clip_actions = clip_actions
         self.rl_device = rl_device
 
-
+     
         # COMPATIBILITY
         #shape_obs=self.num_robot_imagination+self.num_object_cloud+self.num_prop_state
-        shape_obs=self.num_prop_state
-        self.obs_space = [spaces.Box(low=-np.Inf, high=np.Inf, shape=(shape_obs,)) for _ in range(self.num_agents)]
+        # shape_obs=self.num_prop_state
+        # self.obs_space = [spaces.Box(low=-np.Inf, high=np.Inf, shape=(shape_obs,)) for _ in range(self.num_agents)]
+        obs_space_dict={}
+        obs_space=task.get_attr('observation_space')[0]
+        obs_space_dict['state']=spaces.Box(low=-np.Inf, high=np.Inf, shape=(self.num_prop_state,))
+        obs_space_dict['oracle_state']=obs_space['oracle_state']
+        obs_space_dict['relocate-point_cloud']=obs_space['relocate-point_cloud']
+        obs_space_dict['imagination_robot']=obs_space['l_imagination_robot']
+        obs_space=spaces.Dict(obs_space_dict)
+        self.obs_space=[obs_space for _ in range(self.num_agents)]
         self.share_observation_space = [spaces.Box(low=-np.Inf, high=np.Inf, shape=(self.num_states,)) for _ in
                                         range(self.num_agents)]
         self.act_space = tuple([spaces.Box(low=np.ones(self.num_actions) * -clip_actions,
@@ -81,6 +90,13 @@ class MultiVecTaskAllegro():
     @property
     def num_obs(self):
         return self.num_observations
+    
+    def np_dict_to_tensors(self, np_dict):
+        torch_dict = {}
+        for key, value in np_dict.items():
+            tensor = torch.from_numpy(value).to(self.rl_device)
+            torch_dict[key] = tensor
+        return torch_dict
 
 # Python CPU/GPU Class
 class MultiVecTaskPythonAllegro(MultiVecTaskAllegro):
@@ -100,21 +116,37 @@ class MultiVecTaskPythonAllegro(MultiVecTaskAllegro):
         actions_tensor = torch.clamp(actions, -self.clip_actions, self.clip_actions)
         observations, rewards, dones,_=self.task.step(actions_tensor.cpu().numpy())
 
+        observations=self.np_dict_to_tensors(observations)
         hand_obs = []
-        # l_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['l_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, :23],
-        #                                 observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
-        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
-        l_obs=torch.clamp(torch.from_numpy(np.concatenate([ observations['state'][:, :23],observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
-                                        -self.clip_obs, self.clip_obs).to(self.rl_device)
+
+        l_obs=observations.copy()
+        r_obs=observations.copy()
+        l_state=torch.cat((observations['state'][:, :23], observations['state'][:, 46:49], observations['state'][:, -7:]),dim=1)
+        r_state=torch.cat((observations['state'][:, 23:46], observations['state'][:, 49:52], observations['state'][:, -7:]), dim=1)
+        l_obs['state']=l_state
+        r_obs['state']=r_state
+        del l_obs['r_imagination_robot']
+        del l_obs['l_imagination_robot']
+        del r_obs['l_imagination_robot']
+        del r_obs['r_imagination_robot']
+        l_obs['imagination_robot']=observations['l_imagination_robot']
+        r_obs['imagination_robot']=observations['r_imagination_robot']
         hand_obs.append(l_obs)
-        # r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['r_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, 23:46],
-        #                                 observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
-        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
-        r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['state'][:, 23:46],observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
-                                        -self.clip_obs, self.clip_obs).to(self.rl_device)
         hand_obs.append(r_obs)
+        # # l_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['l_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, :23],
+        # #                                 observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
+        # #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # l_obs=torch.clamp(torch.from_numpy(np.concatenate([ observations['state'][:, :23],observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
+        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # hand_obs.append(l_obs)
+        # # r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['r_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, 23:46],
+        # #                                 observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
+        # #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['state'][:, 23:46],observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
+        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # hand_obs.append(r_obs)
         
-        state_buf = torch.clamp(torch.from_numpy(observations['oracle_state']), -self.clip_obs, self.clip_obs).to(self.rl_device)
+        state_buf = observations['oracle_state']
 
         rewards = torch.from_numpy(rewards).unsqueeze(-1).to(self.rl_device)
         dones = torch.from_numpy(dones).to(self.rl_device)
@@ -131,34 +163,50 @@ class MultiVecTaskPythonAllegro(MultiVecTaskAllegro):
             sub_agent_done.append(dones)
             sub_agent_info.append(torch.Tensor(0))
 
-        obs_all = torch.transpose(torch.stack(sub_agent_obs), 1, 0)
-        state_all = torch.transpose(torch.stack(agent_state), 1, 0)
+        #obs_all = torch.transpose(torch.stack(sub_agent_obs), 1, 0)
+        #state_all = torch.transpose(torch.stack(agent_state), 1, 0)
         reward_all = torch.transpose(torch.stack(sub_agent_reward), 1, 0)
         done_all = torch.transpose(torch.stack(sub_agent_done), 1, 0)
         info_all = torch.stack(sub_agent_info)
 
-        return obs_all, state_all, reward_all, done_all, info_all, None
+        return hand_obs, hand_obs, reward_all, done_all, info_all, None
 
     def reset(self):
         actions = 0.01 * (1 - 2 * torch.rand([self.num_environments, self.num_actions * self.num_agents], dtype=torch.float32, device=self.rl_device))
 
         # step the simulator
         observations, rewards, dones,_=self.task.step(actions.cpu().numpy())
-
+        observations=self.np_dict_to_tensors(observations)
         hand_obs = []
-        # l_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['l_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, :23],
-        #                                 observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
-        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
-        l_obs=torch.clamp(torch.from_numpy(np.concatenate([ observations['state'][:, :23],observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
-                                        -self.clip_obs, self.clip_obs).to(self.rl_device)
+
+        l_obs=observations.copy()
+        r_obs=observations.copy()
+        l_state=torch.cat((observations['state'][:, :23], observations['state'][:, 46:49], observations['state'][:, -7:]),dim=1)
+        r_state=torch.cat((observations['state'][:, 23:46], observations['state'][:, 49:52], observations['state'][:, -7:]), dim=1)
+        l_obs['state']=l_state
+        r_obs['state']=r_state
+        del l_obs['r_imagination_robot']
+        del l_obs['l_imagination_robot']
+        del r_obs['l_imagination_robot']
+        del r_obs['r_imagination_robot']
+        l_obs['imagination_robot']=observations['l_imagination_robot']
+        r_obs['imagination_robot']=observations['r_imagination_robot']
         hand_obs.append(l_obs)
-        # r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['r_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, 23:46],
-        #                                 observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
-        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
-        r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['state'][:, 23:46],observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
-                                        -self.clip_obs, self.clip_obs).to(self.rl_device)
         hand_obs.append(r_obs)
-        state_buf = torch.clamp(torch.from_numpy(observations['oracle_state']), -self.clip_obs, self.clip_obs).to(self.rl_device)
+
+        # # l_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['l_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, :23],
+        # #                                 observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
+        # #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # l_obs=torch.clamp(torch.from_numpy(np.concatenate([ observations['state'][:, :23],observations['state'][:, 46:49], observations['state'][:, -7:]], axis=1)),
+        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # hand_obs.append(l_obs)
+        # # r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['r_imagination_robot'], observations['relocate-point_cloud'], observations['state'][:, 23:46],
+        # #                                 observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
+        # #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # r_obs=torch.clamp(torch.from_numpy(np.concatenate([observations['state'][:, 23:46],observations['state'][:, 49:52], observations['state'][:, -7:]], axis=1)),
+        #                                 -self.clip_obs, self.clip_obs).to(self.rl_device)
+        # hand_obs.append(r_obs)
+        state_buf =observations['oracle_state']
         sub_agent_obs = []
         agent_state = []
 
@@ -166,10 +214,10 @@ class MultiVecTaskPythonAllegro(MultiVecTaskAllegro):
             sub_agent_obs.append(hand_obs[i])
             agent_state.append(state_buf)
 
-        obs = torch.transpose(torch.stack(sub_agent_obs), 1, 0)
-        state_all = torch.transpose(torch.stack(agent_state), 1, 0)
+        # obs = torch.transpose(torch.stack(sub_agent_obs), 1, 0)
+        # state_all = torch.transpose(torch.stack(agent_state), 1, 0)
 
-        return obs, state_all, None
+        return hand_obs, _, None
 
 if __name__ == '__main__':
     from vec_env import create_vec_env
