@@ -13,8 +13,8 @@ if __name__ == '__main__':
         object_name = np.random.choice(object_names)
         rotation_reward_weight = 0  # whether to match the orientation of the goal pose
         use_visual_obs = True
-        env_params = dict(object_name=object_name, rotation_reward_weight=rotation_reward_weight,
-                          randomness_scale=1, use_visual_obs=use_visual_obs, use_gui=False,
+        env_params = dict(robot_name="allegro_hand_xarm7",object_name=object_name, rotation_reward_weight=rotation_reward_weight,
+                          randomness_scale=1, use_visual_obs=use_visual_obs, use_gui=True,
                           no_rgb=True)
 
         # If a computing device is provided, designate the rendering device.
@@ -48,15 +48,15 @@ if __name__ == '__main__':
     print(obs.keys())
 
     tic = time()
-    rl_steps = 1000
+    rl_steps = 100
     for _ in range(rl_steps):
         action = np.zeros(env.action_space.shape)
         action[0] = 0.002  # Moving forward ee link in x-axis
         obs, reward, done, info = env.step(action)
+        env.render()
     elapsed_time = time() - tic
 
     pc = obs["relocate-point_cloud"]
-    print('pc shape',pc.shape)
     # The name of the key in observation is "CAMERA_NAME"-"MODALITY_NAME".
     # While CAMERA_NAME is defined in task_setting.CAMERA_CONFIG["relocate"], name is point_cloud.
     # See example_use_multi_camera_visual_env.py for more modalities.
@@ -81,6 +81,5 @@ if __name__ == '__main__':
     obs_cloud.paint_uniform_color(np.array([1, 0, 0]))
     coordinate = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05, origin=[0, 0, 0])
     o3d.visualization.draw_geometries([imagination_goal_cloud, imagination_robot_cloud, coordinate, obs_cloud])
-    print('obs shape:', pc.shape)
 
     env.scene = None

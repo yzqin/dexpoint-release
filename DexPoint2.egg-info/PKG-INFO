@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: DexPoint2
+Version: 0.4.0
+Summary: DexPoint: Generalizable Point Cloud Reinforcement Learning for Sim-to-Real Dexterous Manipulation
+Home-page: https://github.com/yzqin/dexpoint_release
+Author: Yuzhe Qin
+Author-email: y1qin@ucsd.edu
+Keywords: dexterous-manipulation point-cloud reinforcement-learning
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: transforms3d
+Requires-Dist: gym==0.25.2
+Requires-Dist: sapien==2.1.0
+Requires-Dist: open3d>=0.15.2
+Requires-Dist: imageio
+Requires-Dist: torch>=1.11.0
+Provides-Extra: tests
+Requires-Dist: pytest; extra == "tests"
+Requires-Dist: black; extra == "tests"
+Requires-Dist: isort; extra == "tests"
+
+dexpoint_change

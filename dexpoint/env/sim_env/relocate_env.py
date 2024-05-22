@@ -84,17 +84,13 @@ class LabRelocateEnv(BaseSimulationEnv):
             orientation = YCB_ORIENTATION[self.object_name]
         else:
             orientation = np.array([1, 0, 0, 0])
-        pos[0]+=0.1
-        pos[1]-=0.1
         position = np.array([pos[0], pos[1], self.object_height])
         pose = sapien.Pose(position, orientation)
         return pose
 
     def generate_random_target_pose(self, randomness_scale):
-        pos = self.np_random.uniform(low=-0.2, high=0.2, size=2) * randomness_scale
+        pos = self.np_random.uniform(low=-0.1, high=0.1, size=2) * randomness_scale
         height = 0.25
-        pos[0]+=0.1
-        pos[1]-=0.1
         position = np.array([pos[0], pos[1], height])
         # No randomness for the orientation. Keep the canonical orientation.
         if self.object_category == "ycb":
@@ -163,8 +159,8 @@ class LabRelocateEnv(BaseSimulationEnv):
         table_height += robot_table_offset
         builder = self.scene.create_actor_builder()
         top_pose = sapien.Pose(
-            np.array([lab.r_ROBOT2BASE.p[0] - table_half_size[0] + 0.08,
-                      lab.r_ROBOT2BASE.p[1] - table_half_size[1] + 0.08,
+            np.array([lab.ROBOT2BASE.p[0] - table_half_size[0] + 0.08,
+                      lab.ROBOT2BASE.p[1] - table_half_size[1] + 0.08,
                       -table_thickness / 2 + robot_table_offset]))
         top_material = self.scene.create_physical_material(1, 0.5, 0.01)
         builder.add_box_collision(pose=top_pose, half_size=table_half_size, material=top_material)

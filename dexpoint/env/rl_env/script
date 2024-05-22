@@ -1,8 +1,0 @@
-camera = add_camera(name="", width=1024, height=768, fovy=1.57, near=0.1, far=100)
-camera.set_local_pose(Pose([0, 0, 0], [0.5, -0.5, 0.5, 0.5]))
-
-camera = add_camera(name="", width=1024, height=768, fovy=1.57, near=0.1, far=100)
-camera.set_local_pose(Pose([0.270083, -0.73766, 0.407655], [0.177054, -0.295075, 0.0557407, 0.93727]))
-
-camera = add_camera(name="", width=1024, height=768, fovy=1.57, near=0.1, far=100)
-camera.set_local_pose(Pose([0.753426, -0.204789, 0.330868], [0.0707193, 0.0224417, 0.00159144, -0.997243]))

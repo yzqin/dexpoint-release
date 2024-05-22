@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--task_name', type=str, default="laptop")
     parser.add_argument('--extractor_name', type=str, default="smallpn")
     parser.add_argument('--pretrain_path', type=str, default=None)
-    parser.add_argument('--save_freq', type=int, default=50)
+    parser.add_argument('--save_freq', type=int, default=10)
     parser.add_argument('--save_path', type=str, default=SAVE_DIR)
     args = parser.parse_args()
 
@@ -72,41 +72,22 @@ if __name__ == '__main__':
         use_visual_obs = True
         object_name='any_train'
         object_category="02876657"
-        env_params = dict(object_name=object_name, object_category=object_category, rotation_reward_weight=rotation_reward_weight,
-                          randomness_scale=1, use_visual_obs=use_visual_obs, use_gui=False,
+        robot_name = "xarm7_allegro_v2"
+        env_params = dict(robot_name=robot_name, 
+                          object_name=object_name,
+                          object_category=object_category,
+                          frame_skip=20, 
+                          rotation_reward_weight=rotation_reward_weight,
+                          randomness_scale=1, 
+                          use_visual_obs=use_visual_obs, 
+                          use_gui=False,
                           no_rgb=True)
 
-        # If a computing device is provided, designate the rendering device.
-        # On a multi-GPU machine, this sets the rendering GPU and RL training GPU to be the same,
-        # based on "CUDA_VISIBLE_DEVICES".
-        if "CUDA_VISIBLE_DEVICES" in os.environ:
-            env_params["device"] = "cuda:3"
         environment = AllegroRelocateRLEnv(**env_params)
-
-        # Create camera
         environment.setup_camera_from_config(task_setting.CAMERA_CONFIG["relocate"])
-
-        # Specify observation
         environment.setup_visual_obs_config(task_setting.OBS_CONFIG["relocate_noise"])
-
-        # Specify imagination
         environment.setup_imagination_config(task_setting.IMG_CONFIG["relocate_robot_only"])
         return environment
-
-
-    # def create_eval_env_fn():
-    #     unseen_indeces = TRAIN_CONFIG[task_name]['unseen']
-    #     environment = create_env(task_name=task_name,
-    #                              use_visual_obs=True,
-    #                              use_gui=False,
-    #                              is_eval=True,
-    #                              pc_noise=True,
-    #                              index=unseen_indeces,
-    #                              img_type='robot',
-    #                              rand_pos=rand_pos,
-    #                              rand_degree=rand_degree)
-    #     return environment
-
 
     env = SubprocVecEnv([create_env_fn] * args.workers, "spawn")  # train on a list of envs.
 

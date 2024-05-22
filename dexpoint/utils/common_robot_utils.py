@@ -41,41 +41,44 @@ def generate_free_robot_hand_info() -> Dict[str, FreeRobotInfo]:
 
 def generate_arm_robot_hand_info() -> Dict[str, ArmRobotInfo]:
     xarm_path = Path("robot/xarm6_description/")
-
     shadow_hand_xarm6 = ArmRobotInfo(path=str(xarm_path / "xarm6_shadow.urdf"), hand_dof=22, arm_dof=6,
                                      palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0, -np.pi / 2, 0])
     allegro_hand_xarm6 = ArmRobotInfo(path=str(xarm_path / "xarm6_allegro.urdf"), hand_dof=16, arm_dof=6,
-                                      palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0, 0, 0],
+                                      palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0, -np.pi / 2, 0],
                                       root_offset=[-0.0244, 0, 0])
-    allegro_hand_xarm7 = ArmRobotInfo(path=str(xarm_path / "xarm7_allegro_v2.urdf"), hand_dof=16, arm_dof=7,
-                                      palm_name="palm_center", arm_init_qpos=[np.pi/4, np.pi/8, 0, np.pi/8, np.pi, np.pi/2,-np.pi/2],
-                                      root_offset=[-0.0244, 0, 0])   
-    allegro_xarm7_right= ArmRobotInfo(path=str(xarm_path / "xarm7_allegro_right.urdf"), hand_dof=16, arm_dof=7,
-                                      palm_name="palm_center", arm_init_qpos=[0, np.pi/8, 0, np.pi/8, np.pi, np.pi/2,-np.pi/2],
-                                      root_offset=[-0.0244, 0, 0])   
-    allegro_xarm7_left=ArmRobotInfo(path=str(xarm_path / "xarm7_allegro_left.urdf"), hand_dof=16, arm_dof=7,
-                                      palm_name="palm_center", arm_init_qpos=[0, np.pi/8, 0, np.pi/8, np.pi, np.pi/2,np.pi/2],
-                                      root_offset=[-0.0244, 0, 0])                                 
+    allegro_hand_xarm7 = ArmRobotInfo(path=str(xarm_path / "xarm7_allegro.urdf"), hand_dof=16, arm_dof=7,
+                                    # palm_name="link7", arm_init_qpos=[0, 0, 0, 0, -np.pi / 2, np.pi / 2, -np.pi/2],
+                                    # root_offset=[-0.45, 0.15, -0.00])
+                                    # palm_name="link7", arm_init_qpos=[0, 12 * np.pi / 180, 0, 21 * np.pi / 180, 270 * np.pi / 180, 90 * np.pi / 180, -100 * np.pi / 180],
+                                    # root_offset=[-0.60, 0.15, -0.05])
+                                    palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0, -np.pi / 2, np.pi / 2, -np.pi/2],
+                                    root_offset=[-0.50, 0.0, -0.0])
+    allegro_hand_xarm7_wrist_mounted_face_front = ArmRobotInfo(path=str(xarm_path / "xarm7_allegro_wrist_mounted_rotate.urdf"), hand_dof=16, arm_dof=7,
+                                    palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0,  np.pi , np.pi / 2, np.pi],
+                                    # palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0, np.pi / 4, -np.pi / 2,  np.pi / 2],
+                                    root_offset=[0.00, 0, -0.0])
+    xarm7_allegro_v2 = ArmRobotInfo(path=str(xarm_path / "xarm7_allegro_v2.urdf"), hand_dof=16, arm_dof=7,
+                                    palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0,  np.pi , np.pi / 2, np.pi / 2],
+                                    root_offset=[-0.50, 0.0, -0.0])
     allegro_hand_xarm6_wrist_mounted_face_down = ArmRobotInfo(
         path="robot/xarm6_description/xarm6_allegro_wrist_mounted_rotate.urdf",
-        hand_dof=16, arm_dof=6, palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0, 0, 0],
+        hand_dof=16, arm_dof=6, palm_name="palm_center", arm_init_qpos=[0, 0, 0, 0, 0, -np.pi / 2],
         root_offset=[0.00, 0, 0])
     allegro_hand_xarm6_wrist_mounted_face_front = ArmRobotInfo(
         path="robot/xarm6_description/xarm6_allegro_wrist_mounted_rotate.urdf",
         hand_dof=16, arm_dof=6, palm_name="palm_center", arm_init_qpos=[0, 0, 0, np.pi, np.pi / 2, np.pi],
-        root_offset=[0.00, 0, 0])
+        root_offset=[0.0, 0.0, 0])
     allegro_hand_digit_xarm6_wrist_mounted_face_front = ArmRobotInfo(
         path="robot/xarm6_description/xarm6_allegro_digit_wrist_mounted_rotate.urdf",
         hand_dof=16, arm_dof=6, palm_name="palm_center", arm_init_qpos=[0, 0, 0, np.pi, np.pi / 2, np.pi],
         root_offset=[0.00, 0, 0])
-    
     info_dict = dict(
         shadow_hand_xarm6=shadow_hand_xarm6,
         allegro_hand_xarm6=allegro_hand_xarm6,
-        allegro_xarm7_left=allegro_xarm7_left,
-        allegro_xarm7_right=allegro_xarm7_right,
         allegro_hand_xarm7=allegro_hand_xarm7,
+        xarm7_allegro_v2=xarm7_allegro_v2,
         allegro_hand_xarm6_wrist_mounted_face_down=allegro_hand_xarm6_wrist_mounted_face_down,
+        allegro_hand_xarm7_wrist_mounted_face_front=allegro_hand_xarm7_wrist_mounted_face_front,
         allegro_hand_xarm6_wrist_mounted_face_front=allegro_hand_xarm6_wrist_mounted_face_front,
         allegro_hand_digit_xarm6_wrist_mounted_face_front=allegro_hand_digit_xarm6_wrist_mounted_face_front,
     )
@@ -118,7 +121,6 @@ def load_robot(scene: sapien.Scene, robot_name, disable_self_collision=True) -> 
         info = generate_arm_robot_hand_info()[robot_name]
     robot_file = info.path
     filename = str(package_dir / robot_file)
-    print('filename:',filename)
     robot_builder = loader.load_file_as_articulation_builder(filename)
     if disable_self_collision:
         for link_builder in robot_builder.get_link_builders():

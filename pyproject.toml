@@ -1,5 +1,0 @@
-[tool.isort]
-extend_skip = [".md", ".json", "__init__.py", "setup.py"]
-
-[tool.black]
-target-version = ["py38"]

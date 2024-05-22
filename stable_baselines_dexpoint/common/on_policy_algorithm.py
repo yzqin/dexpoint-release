@@ -12,6 +12,8 @@ from stable_baselines_dexpoint.common.policies import ActorCriticPolicy
 from stable_baselines_dexpoint.common.type_aliases import GymEnv, MaybeCallback, Schedule
 from stable_baselines_dexpoint.common.utils import obs_as_tensor, safe_mean
 from stable_baselines_dexpoint.common.vec_env import VecEnv
+import swanlab
+
 
 
 class OnPolicyAlgorithm(BaseAlgorithm):
@@ -72,6 +74,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
             supported_action_spaces: Optional[Tuple[gym.spaces.Space, ...]] = None,
     ):
 
+
         super().__init__(
             policy=policy,
             env=env,
@@ -97,12 +100,26 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         self.rollout_buffer = None
 
         self.last_rollout_reward = -np.inf
+        self.reward_info = {
+            "reward_finger_object_dis": 0.0,
+            "reward_hand_action":0.0,
+            "reward_palm_object_dis": 0.0,
+            "reward_contact_and_lift": 0.0,
+            "reward_target_obj_dis": 0.0,
+            "reward_other": 0.0,
+        }
         self.need_restore = False
         self.last_policy_saved: List[Dict] = [{}, {}]
         self.current_restore_step = 0
 
         if _init_setup_model:
             self._setup_model()
+
+        self.log_run = swanlab.init(
+            experiment_name="dexpoint",
+            description="dexpoint实验",
+            logdir="./logs"
+        )
 
     def _setup_model(self) -> None:
         self._setup_lr_schedule()
@@ -153,6 +170,8 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         self.policy.set_training_mode(False)
         last_episode_reward = self.last_rollout_reward
         self.last_rollout_reward = 0
+        for key in self.reward_info:
+            self.reward_info[key] = 0
         num_rollouts = 0
         n_steps = 0
         rollout_buffer.reset()
@@ -210,6 +229,13 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                     num_rollouts += 1
 
             self.last_rollout_reward += rewards.sum()
+            # 遍历 self.reward_info 每一个元素 与 info中对应元素相加：
+            # print(self.reward_info)
+            # print(infos)
+
+            for i in range(len(infos)):
+                for key in self.reward_info:
+                    self.reward_info[key] += infos[i][key]
 
             rollout_buffer.add(self._last_obs, actions, rewards, self._last_episode_starts, values, log_probs)
             self._last_obs = new_obs
@@ -221,6 +247,9 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         rollout_buffer.compute_returns_and_advantage(last_values=values, dones=dones)
 
         self.last_rollout_reward /= num_rollouts
+            # 遍历 self.reward_info 每一个元素 与 info中对应元素相加：
+        for key in self.reward_info:
+                self.reward_info[key] /= num_rollouts
         reward_gap = last_episode_reward - self.last_rollout_reward
         self.need_restore = False
         self.current_restore_step = 0
@@ -294,6 +323,12 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                 self.logger.record("time/time_elapsed", int(time.time() - self.start_time), exclude="tensorboard")
                 self.logger.record("time/total_timesteps", self.num_timesteps, exclude="tensorboard")
                 self.logger.dump(step=iteration)
+                Dict_log = {}
+                for key in self.reward_info:
+                    Dict_log[key] = self.reward_info[key]
+                Dict_log["time/iterations"] = iteration
+                Dict_log["rollout/rollout_rew_mean"] = self.last_rollout_reward
+                swanlab.log(Dict_log)
 
             x = time.time()
             self.train()

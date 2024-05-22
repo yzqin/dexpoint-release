@@ -20,7 +20,7 @@ def recover_action(action, limit):
 class BaseSimulationEnv(object):
     def __init__(self, use_gui=True, frame_skip=5, use_visual_obs=False, no_rgb=False, need_offscreen_render=False,
                  **renderer_kwargs):
-        need_offscreen_render = need_offscreen_render or use_visual_obs # whether use windowed render
+        need_offscreen_render = need_offscreen_render or use_visual_obs
         engine, renderer = get_engine_and_renderer(use_gui=use_gui, need_offscreen_render=need_offscreen_render,
                                                    no_rgb=no_rgb, **renderer_kwargs)
         self.use_gui = use_gui
@@ -195,10 +195,9 @@ class BaseSimulationEnv(object):
                                 fov: float):
         if not len(resolution) == 2:
             raise ValueError(f"Resolution should be a 2d array, but now {len(resolution)} is given.")
-        # sapien2opencv = np.array([[0, -1, 0], [0, 0, -1], [1, 0, 0]])
-        # sapien2opencv_quat = transforms3d.quaternions.mat2quat(sapien2opencv)
-        # pose_cam = pose * sapien.Pose(q=sapien2opencv_quat)
-        pose_cam = pose
+        sapien2opencv = np.array([[0, -1, 0], [0, 0, -1], [1, 0, 0]])
+        sapien2opencv_quat = transforms3d.quaternions.mat2quat(sapien2opencv)
+        pose_cam = pose * sapien.Pose(q=sapien2opencv_quat)
         cam = self.scene.add_camera(name, width=resolution[0], height=resolution[1], fovy=fov, near=0.1, far=10)
         cam.set_local_pose(pose_cam)
         self.cameras.update({name: cam})

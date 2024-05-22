@@ -5,7 +5,7 @@ root_dir = Path(__file__).parent
 long_description = (root_dir / "README.md").read_text(encoding="utf-8")
 
 setup(
-    name="DexPoint",
+    name="DexPoint2",
     version="0.4.0",
     author="Yuzhe Qin",
     author_email="y1qin@ucsd.edu",
@@ -20,7 +20,7 @@ setup(
         "numpy",
         "transforms3d",
         "gym==0.25.2",
-        'sapien>=2.1.0',
+        'sapien==2.1.0',
         "open3d>=0.15.2",
         "imageio",
         "torch>=1.11.0"
